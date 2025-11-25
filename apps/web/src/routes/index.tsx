@@ -1,19 +1,24 @@
+import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import viteLogo from "/vite.svg";
-import { api } from "./lib/api";
 import { useQuery } from "@tanstack/react-query";
-import { Button } from "@/components/ui/button";
+import { api } from "@/lib/api";
+import viteLogo from "/vite.svg";
+import reactLogo from "@/assets/react.svg";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
+  CardDescription,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 
-function App() {
+export const Route = createFileRoute("/")({
+  component: Index,
+});
+
+function Index() {
   const [count, setCount] = useState(0);
 
   const { data: message, isLoading: messageLoading } = useQuery({
@@ -99,5 +104,3 @@ function App() {
     </div>
   );
 }
-
-export default App;
