@@ -1,10 +1,28 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useEffect, useState } from "react";
+import reactLogo from "./assets/react.svg";
+import viteLogo from "/vite.svg";
+import "./App.css";
+import { api } from "./lib/api";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [count, setCount] = useState(0);
+  const [message, setMessage] = useState<string | null>(null);
+  const [health, setHealth] = useState<{
+    status: string;
+    timestamp: number;
+  } | null>(null);
+
+  useEffect(() => {
+    // Fetch the root endpoint using treaty syntax
+    api.get().then(({ data }) => {
+      if (data) setMessage(data);
+    });
+
+    // Fetch the health endpoint
+    api.health.get().then(({ data }) => {
+      if (data) setHealth(data);
+    });
+  }, []);
 
   return (
     <>
@@ -17,19 +35,29 @@ function App() {
         </a>
       </div>
       <h1>Vite + React</h1>
+
       <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
+        <h3>Eden Treaty Demo</h3>
+        <p>
+          <strong>API Message:</strong> {message ?? "Loading..."}
+        </p>
+        <p>
+          <strong>Health:</strong>{" "}
+          {health
+            ? `${health.status} (${new Date(health.timestamp).toLocaleTimeString()})`
+            : "Loading..."}
+        </p>
+      </div>
+
+      <div className="card">
+        <button onClick={() => setCount((count) => count + 1)}>count is {count}</button>
         <p>
           Edit <code>src/App.tsx</code> and save to test HMR
         </p>
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <p className="read-the-docs">Click on the Vite and React logos to learn more</p>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
