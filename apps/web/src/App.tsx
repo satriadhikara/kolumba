@@ -1,28 +1,21 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import reactLogo from "./assets/react.svg";
 import viteLogo from "/vite.svg";
 import "./App.css";
 import { api } from "./lib/api";
+import { useQuery } from "@tanstack/react-query";
 
 function App() {
   const [count, setCount] = useState(0);
-  const [message, setMessage] = useState<string | null>(null);
-  const [health, setHealth] = useState<{
-    status: string;
-    timestamp: number;
-  } | null>(null);
 
-  useEffect(() => {
-    // Fetch the root endpoint using treaty syntax
-    api.get().then(({ data }) => {
-      if (data) setMessage(data);
-    });
-
-    // Fetch the health endpoint
-    api.health.get().then(({ data }) => {
-      if (data) setHealth(data);
-    });
-  }, []);
+  const { data: message } = useQuery({
+    queryKey: ["message"],
+    queryFn: () => api.get().then((res) => res.data),
+  });
+  const { data: health } = useQuery({
+    queryKey: ["health"],
+    queryFn: () => api.health.get().then((res) => res.data),
+  });
 
   return (
     <>
