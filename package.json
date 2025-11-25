@@ -1,8 +1,18 @@
 {
   "name": "kolumba",
-  "module": "index.ts",
   "type": "module",
   "private": true,
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "bun run --filter '*' dev",
+    "dev:api": "bun run --filter @kolumba/api dev",
+    "dev:web": "bun run --filter @kolumba/web dev",
+    "build": "bun run --filter '*' build",
+    "lint": "bun run --filter '*' lint"
+  },
   "devDependencies": {
     "@types/bun": "latest"
   },
