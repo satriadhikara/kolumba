@@ -33,6 +33,8 @@ Kolumba is a purpose-built webmail client for Stalwart Mail Server. Unlike gener
 - [Bun](https://bun.sh/) (v1.0+) or Node.js (v20+)
 - A running [Stalwart Mail Server](https://stalw.art/) instance with JMAP enabled
 
+> **New to Stalwart?** See our [Stalwart Setup Guide](docs/stalwart-setup.md) for step-by-step instructions on setting up Stalwart Mail Server with Docker, configuring JMAP, and creating user accounts.
+
 ### Installation
 
 ```bash
