@@ -16,10 +16,10 @@ export const Route = createFileRoute('/_authed/mail/compose')({
     forward: search.forward as string | undefined,
   }),
 
-  loaderDeps: ({ search }) => ({
-    replyTo: search.replyTo,
-    replyAll: search.replyAll,
-    forward: search.forward,
+  loaderDeps: ({ search: { replyTo, replyAll, forward } }) => ({
+    replyTo,
+    replyAll,
+    forward,
   }),
 
   loader: async ({ deps }) => {
