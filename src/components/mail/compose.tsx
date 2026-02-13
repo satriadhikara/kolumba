@@ -29,7 +29,10 @@ function getForwardSubject(subject: string | null): string {
 }
 
 function formatQuotedText(email: Email): string {
-  const date = new Date(email.receivedAt).toLocaleString()
+  const date = new Date(email.receivedAt).toLocaleString('en-US', {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+  })
   const from = email.from?.[0]?.email || 'Unknown'
 
   let body = ''
@@ -88,7 +91,7 @@ export function Compose({
         ccRecipients.push(
           ...originalEmail.cc
             .filter((addr) => !myEmails.includes(addr.email.toLowerCase()))
-            .map((addr) => addr.email)
+            .map((addr) => addr.email),
         )
       }
 
@@ -102,7 +105,7 @@ export function Compose({
   }, [originalEmail, mode, identities])
 
   const parseAddresses = (
-    input: string
+    input: string,
   ): { name?: string; email: string }[] => {
     if (!input.trim()) return []
     return input
@@ -186,7 +189,9 @@ export function Compose({
             >
               {identities.map((identity) => (
                 <option key={identity.id} value={identity.id}>
-                  {identity.name ? `${identity.name} <${identity.email}>` : identity.email}
+                  {identity.name
+                    ? `${identity.name} <${identity.email}>`
+                    : identity.email}
                 </option>
               ))}
             </select>

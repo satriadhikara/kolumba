@@ -12,11 +12,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { JMAPKeywords, type Email } from '@/lib/jmap/types'
-import {
-  toggleStarFn,
-  deleteEmailFn,
-  archiveEmailFn,
-} from '@/server/jmap'
+import { toggleStarFn, deleteEmailFn, archiveEmailFn } from '@/server/jmap'
 
 interface MessageViewProps {
   email: Email
@@ -24,7 +20,7 @@ interface MessageViewProps {
 
 function formatFullDate(dateString: string): string {
   const date = new Date(dateString)
-  return date.toLocaleString(undefined, {
+  return date.toLocaleString('en-US', {
     weekday: 'long',
     year: 'numeric',
     month: 'long',
@@ -42,7 +38,7 @@ function formatAddress(addr: { name: string | null; email: string }): string {
 }
 
 function formatAddresses(
-  addrs: { name: string | null; email: string }[] | null
+  addrs: { name: string | null; email: string }[] | null,
 ): string {
   if (!addrs || addrs.length === 0) return ''
   return addrs.map(formatAddress).join(', ')
@@ -59,7 +55,10 @@ function getInitials(from: Email['from']): string {
   return name.slice(0, 2).toUpperCase()
 }
 
-function getEmailBody(email: Email): { html: string | null; text: string | null } {
+function getEmailBody(email: Email): {
+  html: string | null
+  text: string | null
+} {
   let html: string | null = null
   let text: string | null = null
 
@@ -145,12 +144,18 @@ export function MessageView({ email }: MessageViewProps) {
         </Link>
 
         <Button variant="ghost" size="sm" onClick={handleReply}>
-          <HugeiconsIcon icon={ArrowTurnBackwardIcon} className="h-4 w-4 mr-1" />
+          <HugeiconsIcon
+            icon={ArrowTurnBackwardIcon}
+            className="h-4 w-4 mr-1"
+          />
           Reply
         </Button>
 
         <Button variant="ghost" size="sm" onClick={handleReplyAll}>
-          <HugeiconsIcon icon={ArrowTurnBackwardIcon} className="h-4 w-4 mr-1" />
+          <HugeiconsIcon
+            icon={ArrowTurnBackwardIcon}
+            className="h-4 w-4 mr-1"
+          />
           Reply All
         </Button>
 
@@ -227,29 +232,31 @@ export function MessageView({ email }: MessageViewProps) {
           </div>
 
           {/* Attachments */}
-          {email.hasAttachment && email.attachments && email.attachments.length > 0 && (
-            <div className="mb-6 p-4 bg-muted/50 rounded-lg">
-              <div className="flex items-center gap-2 text-sm font-medium mb-2">
-                <HugeiconsIcon icon={AttachmentIcon} className="h-4 w-4" />
-                <span>Attachments ({email.attachments.length})</span>
+          {email.hasAttachment &&
+            email.attachments &&
+            email.attachments.length > 0 && (
+              <div className="mb-6 p-4 bg-muted/50 rounded-lg">
+                <div className="flex items-center gap-2 text-sm font-medium mb-2">
+                  <HugeiconsIcon icon={AttachmentIcon} className="h-4 w-4" />
+                  <span>Attachments ({email.attachments.length})</span>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {email.attachments.map((att, i) => (
+                    <div
+                      key={att.blobId || i}
+                      className="px-3 py-1.5 bg-background rounded border text-sm"
+                    >
+                      {att.name || `Attachment ${i + 1}`}
+                      {att.size && (
+                        <span className="ml-2 text-muted-foreground">
+                          ({Math.round(att.size / 1024)}KB)
+                        </span>
+                      )}
+                    </div>
+                  ))}
+                </div>
               </div>
-              <div className="flex flex-wrap gap-2">
-                {email.attachments.map((att, i) => (
-                  <div
-                    key={att.blobId || i}
-                    className="px-3 py-1.5 bg-background rounded border text-sm"
-                  >
-                    {att.name || `Attachment ${i + 1}`}
-                    {att.size && (
-                      <span className="ml-2 text-muted-foreground">
-                        ({Math.round(att.size / 1024)}KB)
-                      </span>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+            )}
 
           {/* Body */}
           <div className="prose prose-zinc dark:prose-invert max-w-none">
@@ -286,7 +293,9 @@ export function MessageView({ email }: MessageViewProps) {
                 title="Email content"
               />
             ) : text ? (
-              <pre className="whitespace-pre-wrap font-sans text-sm">{text}</pre>
+              <pre className="whitespace-pre-wrap font-sans text-sm">
+                {text}
+              </pre>
             ) : (
               <p className="text-muted-foreground italic">No content</p>
             )}
