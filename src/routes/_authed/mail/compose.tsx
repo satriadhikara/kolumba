@@ -16,18 +16,13 @@ export const Route = createFileRoute('/_authed/mail/compose')({
     forward: search.forward as string | undefined,
   }),
 
-  loaderDeps: ({ search: { replyTo, replyAll, forward } }) => ({
-    replyTo,
-    replyAll,
-    forward,
-  }),
+  loaderDeps: ({ search }: { search: ComposeSearch }) => search,
 
-  loader: async ({ deps }) => {
+  loader: async ({ deps }: { deps: ComposeSearch }) => {
     const identities = await getIdentitiesFn()
 
     let originalEmail: Email | null = null
 
-    // Load original email for reply/forward
     if (deps.replyTo) {
       originalEmail = await getEmailFn({ data: { emailId: deps.replyTo } })
     } else if (deps.forward) {
@@ -45,6 +40,15 @@ export const Route = createFileRoute('/_authed/mail/compose')({
           ? 'forward'
           : 'new',
     }
+  },
+  errorComponent: ({ error }) => {
+    console.error('Compose route error:', error)
+    return (
+      <div className="p-4">
+        <h2>Error loading compose</h2>
+        <p>{error?.message || String(error)}</p>
+      </div>
+    )
   },
   component: ComposeRoute,
 })
