@@ -37,18 +37,18 @@ export const MailboxMethods = {
    */
   async getAll(
     client: JMAPClient,
-    accountId: string
+    accountId: string,
   ): Promise<GetResult<Mailbox>> {
     const builder = new JMAPRequestBuilder()
     builder.addCapability(JMAPCapabilities.MAIL)
 
-    builder.call('Mailbox/get', {
+    const callId = builder.call('Mailbox/get', {
       accountId,
-      ids: null, // null means get all
+      ids: null,
     })
 
     const parser = await client.execute(builder)
-    return parser.get<GetResult<Mailbox>>('call-0')
+    return parser.get<GetResult<Mailbox>>(callId)
   },
 
   /**
@@ -57,13 +57,11 @@ export const MailboxMethods = {
   async get(
     client: JMAPClient,
     accountId: string,
-    ids: string[]
+    ids: string[],
   ): Promise<GetResult<Mailbox>> {
-    return client.call<GetResult<Mailbox>>(
-      'Mailbox/get',
-      { accountId, ids },
-      [JMAPCapabilities.MAIL]
-    )
+    return client.call<GetResult<Mailbox>>('Mailbox/get', { accountId, ids }, [
+      JMAPCapabilities.MAIL,
+    ])
   },
 
   /**
@@ -76,12 +74,12 @@ export const MailboxMethods = {
       create?: Record<string, Partial<Mailbox>>
       update?: Record<string, Partial<Mailbox>>
       destroy?: string[]
-    }
+    },
   ): Promise<SetResult<Mailbox>> {
     return client.call<SetResult<Mailbox>>(
       'Mailbox/set',
       { accountId, ...options },
-      [JMAPCapabilities.MAIL]
+      [JMAPCapabilities.MAIL],
     )
   },
 
@@ -109,7 +107,7 @@ export const EmailMethods = {
       position?: number
       limit?: number
       properties?: (keyof Email)[]
-    } = {}
+    } = {},
   ): Promise<{ query: QueryResult; emails: EmailListItem[] }> {
     const builder = new JMAPRequestBuilder()
     builder.addCapability(JMAPCapabilities.MAIL)
@@ -133,7 +131,7 @@ export const EmailMethods = {
     })
 
     // Second call: get emails using back-reference
-    builder.call('Email/get', {
+    const getCallId = builder.call('Email/get', {
       accountId,
       '#ids': builder.ref(queryCallId, '/ids'),
       properties,
@@ -142,7 +140,7 @@ export const EmailMethods = {
     const parser = await client.execute(builder)
 
     const queryResult = parser.get<QueryResult>(queryCallId)
-    const getResult = parser.get<GetResult<EmailListItem>>('call-1')
+    const getResult = parser.get<GetResult<EmailListItem>>(getCallId)
 
     return {
       query: queryResult,
@@ -157,12 +155,12 @@ export const EmailMethods = {
     client: JMAPClient,
     accountId: string,
     ids: string[],
-    properties: (keyof Email)[] = EMAIL_FULL_PROPERTIES
+    properties: (keyof Email)[] = EMAIL_FULL_PROPERTIES,
   ): Promise<GetResult<Email>> {
     const builder = new JMAPRequestBuilder()
     builder.addCapability(JMAPCapabilities.MAIL)
 
-    builder.call('Email/get', {
+    const callId = builder.call('Email/get', {
       accountId,
       ids,
       properties,
@@ -173,7 +171,7 @@ export const EmailMethods = {
     })
 
     const parser = await client.execute(builder)
-    return parser.get<GetResult<Email>>('call-0')
+    return parser.get<GetResult<Email>>(callId)
   },
 
   /**
@@ -183,7 +181,7 @@ export const EmailMethods = {
     client: JMAPClient,
     accountId: string,
     emailId: string,
-    keywords: Keywords
+    keywords: Keywords,
   ): Promise<SetResult<Email>> {
     return client.call<SetResult<Email>>(
       'Email/set',
@@ -193,7 +191,7 @@ export const EmailMethods = {
           [emailId]: { keywords },
         },
       },
-      [JMAPCapabilities.MAIL]
+      [JMAPCapabilities.MAIL],
     )
   },
 
@@ -204,7 +202,7 @@ export const EmailMethods = {
     client: JMAPClient,
     accountId: string,
     emailId: string,
-    keyword: string
+    keyword: string,
   ): Promise<SetResult<Email>> {
     return client.call<SetResult<Email>>(
       'Email/set',
@@ -214,7 +212,7 @@ export const EmailMethods = {
           [emailId]: { [`keywords/${keyword}`]: true },
         },
       },
-      [JMAPCapabilities.MAIL]
+      [JMAPCapabilities.MAIL],
     )
   },
 
@@ -225,7 +223,7 @@ export const EmailMethods = {
     client: JMAPClient,
     accountId: string,
     emailId: string,
-    keyword: string
+    keyword: string,
   ): Promise<SetResult<Email>> {
     return client.call<SetResult<Email>>(
       'Email/set',
@@ -235,7 +233,7 @@ export const EmailMethods = {
           [emailId]: { [`keywords/${keyword}`]: null },
         },
       },
-      [JMAPCapabilities.MAIL]
+      [JMAPCapabilities.MAIL],
     )
   },
 
@@ -246,7 +244,7 @@ export const EmailMethods = {
     client: JMAPClient,
     accountId: string,
     emailId: string,
-    toMailboxId: string
+    toMailboxId: string,
   ): Promise<SetResult<Email>> {
     return client.call<SetResult<Email>>(
       'Email/set',
@@ -256,7 +254,7 @@ export const EmailMethods = {
           [emailId]: { mailboxIds: { [toMailboxId]: true } },
         },
       },
-      [JMAPCapabilities.MAIL]
+      [JMAPCapabilities.MAIL],
     )
   },
 
@@ -268,7 +266,7 @@ export const EmailMethods = {
     accountId: string,
     emailId: string,
     fromMailboxId: string,
-    toMailboxId: string
+    toMailboxId: string,
   ): Promise<SetResult<Email>> {
     return client.call<SetResult<Email>>(
       'Email/set',
@@ -281,7 +279,7 @@ export const EmailMethods = {
           },
         },
       },
-      [JMAPCapabilities.MAIL]
+      [JMAPCapabilities.MAIL],
     )
   },
 
@@ -291,7 +289,7 @@ export const EmailMethods = {
   async destroy(
     client: JMAPClient,
     accountId: string,
-    emailIds: string[]
+    emailIds: string[],
   ): Promise<SetResult<Email>> {
     return client.call<SetResult<Email>>(
       'Email/set',
@@ -299,7 +297,7 @@ export const EmailMethods = {
         accountId,
         destroy: emailIds,
       },
-      [JMAPCapabilities.MAIL]
+      [JMAPCapabilities.MAIL],
     )
   },
 
@@ -319,7 +317,7 @@ export const EmailMethods = {
       textBody?: { value: string; type: string }[]
       htmlBody?: { value: string; type: string }[]
       keywords?: Keywords
-    }
+    },
   ): Promise<SetResult<Email>> {
     const emailToCreate = {
       ...draft,
@@ -337,7 +335,7 @@ export const EmailMethods = {
           draft: emailToCreate,
         },
       },
-      [JMAPCapabilities.MAIL]
+      [JMAPCapabilities.MAIL],
     )
   },
 
@@ -348,7 +346,7 @@ export const EmailMethods = {
     client: JMAPClient,
     accountId: string,
     sinceState: string,
-    maxChanges?: number
+    maxChanges?: number,
   ): Promise<ChangesResult> {
     return client.call<ChangesResult>(
       'Email/changes',
@@ -357,7 +355,7 @@ export const EmailMethods = {
         sinceState,
         maxChanges,
       },
-      [JMAPCapabilities.MAIL]
+      [JMAPCapabilities.MAIL],
     )
   },
 
@@ -371,7 +369,7 @@ export const EmailMethods = {
     options: {
       limit?: number
       inMailbox?: string
-    } = {}
+    } = {},
   ): Promise<{ query: QueryResult; emails: EmailListItem[] }> {
     const filter: EmailFilter = { text }
     if (options.inMailbox) {
@@ -409,7 +407,7 @@ export const EmailSubmissionMethods = {
         inReplyTo?: string[]
         references?: string[]
       }
-    }
+    },
   ): Promise<{
     emailResult: SetResult<Email>
     submissionResult: SetResult<EmailSubmission>
@@ -427,7 +425,7 @@ export const EmailSubmissionMethods = {
     })
 
     // Create the submission with back-reference to the email
-    builder.call('EmailSubmission/set', {
+    const submissionCallId = builder.call('EmailSubmission/set', {
       accountId,
       create: {
         submission: {
@@ -448,7 +446,8 @@ export const EmailSubmissionMethods = {
 
     return {
       emailResult: parser.get<SetResult<Email>>(emailCallId),
-      submissionResult: parser.get<SetResult<EmailSubmission>>('call-1'),
+      submissionResult:
+        parser.get<SetResult<EmailSubmission>>(submissionCallId),
     }
   },
 
@@ -460,13 +459,13 @@ export const EmailSubmissionMethods = {
     accountId: string,
     emailId: string,
     identityId: string,
-    sentMailboxId: string
+    sentMailboxId: string,
   ): Promise<SetResult<EmailSubmission>> {
     const builder = new JMAPRequestBuilder()
     builder.addCapability(JMAPCapabilities.MAIL)
     builder.addCapability(JMAPCapabilities.SUBMISSION)
 
-    builder.call('EmailSubmission/set', {
+    const callId = builder.call('EmailSubmission/set', {
       accountId,
       create: {
         submission: {
@@ -484,7 +483,7 @@ export const EmailSubmissionMethods = {
     })
 
     const parser = await client.execute(builder)
-    return parser.get<SetResult<EmailSubmission>>('call-0')
+    return parser.get<SetResult<EmailSubmission>>(callId)
   },
 }
 
@@ -497,12 +496,12 @@ export const IdentityMethods = {
    */
   async getAll(
     client: JMAPClient,
-    accountId: string
+    accountId: string,
   ): Promise<GetResult<Identity>> {
     return client.call<GetResult<Identity>>(
       'Identity/get',
       { accountId, ids: null },
-      [JMAPCapabilities.SUBMISSION]
+      [JMAPCapabilities.SUBMISSION],
     )
   },
 
@@ -512,12 +511,12 @@ export const IdentityMethods = {
   async get(
     client: JMAPClient,
     accountId: string,
-    ids: string[]
+    ids: string[],
   ): Promise<GetResult<Identity>> {
     return client.call<GetResult<Identity>>(
       'Identity/get',
       { accountId, ids },
-      [JMAPCapabilities.SUBMISSION]
+      [JMAPCapabilities.SUBMISSION],
     )
   },
 }
@@ -535,7 +534,10 @@ export function createEmailHelper(client: JMAPClient, accountId: string) {
     },
 
     // Email operations
-    listEmails: (mailboxId: string, options?: { limit?: number; position?: number }) =>
+    listEmails: (
+      mailboxId: string,
+      options?: { limit?: number; position?: number },
+    ) =>
       EmailMethods.queryAndGet(client, accountId, {
         filter: { inMailbox: mailboxId },
         ...options,
@@ -564,7 +566,9 @@ export function createEmailHelper(client: JMAPClient, accountId: string) {
     // Send email
     sendEmail: (
       identityId: string,
-      email: Parameters<typeof EmailSubmissionMethods.createAndSend>[2]['email']
+      email: Parameters<
+        typeof EmailSubmissionMethods.createAndSend
+      >[2]['email'],
     ) =>
       EmailSubmissionMethods.createAndSend(client, accountId, {
         identityId,
