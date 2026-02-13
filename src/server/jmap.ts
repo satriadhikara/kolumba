@@ -7,7 +7,7 @@
 import { createServerFn } from '@tanstack/react-start'
 import { redirect } from '@tanstack/react-router'
 import { useAppSession, isSessionValid } from './session'
-import { createJMAPClient } from '@/lib/jmap/client'
+import { createJMAPClient, resetCallIdCounter } from '@/lib/jmap/client'
 import {
   MailboxMethods,
   EmailMethods,
@@ -28,6 +28,7 @@ import type {
  * Helper to get authenticated JMAP client
  */
 async function getAuthenticatedClient() {
+  resetCallIdCounter()
   const session = await useAppSession()
 
   if (!isSessionValid(session.data)) {
@@ -54,7 +55,7 @@ export const getMailboxesFn = createServerFn({ method: 'GET' }).handler(
     const { client, accountId } = await getAuthenticatedClient()
     const result = await MailboxMethods.getAll(client, accountId)
     return result.list
-  }
+  },
 )
 
 /**
@@ -74,7 +75,9 @@ export const createMailboxFn = createServerFn({ method: 'POST' })
     })
 
     if (result.notCreated?.newMailbox) {
-      throw new Error(result.notCreated.newMailbox.description || 'Failed to create mailbox')
+      throw new Error(
+        result.notCreated.newMailbox.description || 'Failed to create mailbox',
+      )
     }
 
     return result.created?.newMailbox
@@ -93,7 +96,8 @@ export const deleteMailboxFn = createServerFn({ method: 'POST' })
 
     if (result.notDestroyed?.[data.mailboxId]) {
       throw new Error(
-        result.notDestroyed[data.mailboxId].description || 'Failed to delete mailbox'
+        result.notDestroyed[data.mailboxId].description ||
+          'Failed to delete mailbox',
       )
     }
 
@@ -109,7 +113,7 @@ export const deleteMailboxFn = createServerFn({ method: 'POST' })
  */
 export const getEmailsFn = createServerFn({ method: 'GET' })
   .inputValidator(
-    (data: { mailboxId: string; limit?: number; position?: number }) => data
+    (data: { mailboxId: string; limit?: number; position?: number }) => data,
   )
   .handler(
     async ({
@@ -132,7 +136,7 @@ export const getEmailsFn = createServerFn({ method: 'GET' })
         total: result.query.total ?? 0,
         position: result.query.position,
       }
-    }
+    },
   )
 
 /**
@@ -184,7 +188,12 @@ export const toggleStarFn = createServerFn({ method: 'POST' })
     if (data.starred) {
       await EmailMethods.addKeyword(client, accountId, data.emailId, '$flagged')
     } else {
-      await EmailMethods.removeKeyword(client, accountId, data.emailId, '$flagged')
+      await EmailMethods.removeKeyword(
+        client,
+        accountId,
+        data.emailId,
+        '$flagged',
+      )
     }
 
     return { success: true }
@@ -250,7 +259,9 @@ export const archiveEmailFn = createServerFn({ method: 'POST' })
  * Search emails
  */
 export const searchEmailsFn = createServerFn({ method: 'GET' })
-  .inputValidator((data: { query: string; mailboxId?: string; limit?: number }) => data)
+  .inputValidator(
+    (data: { query: string; mailboxId?: string; limit?: number }) => data,
+  )
   .handler(
     async ({
       data,
@@ -269,7 +280,7 @@ export const searchEmailsFn = createServerFn({ method: 'GET' })
         emails: result.emails,
         total: result.query.total ?? result.emails.length,
       }
-    }
+    },
   )
 
 // =============================================================================
@@ -284,7 +295,7 @@ export const getIdentitiesFn = createServerFn({ method: 'GET' }).handler(
     const { client, accountId } = await getAuthenticatedClient()
     const result = await IdentityMethods.getAll(client, accountId)
     return result.list
-  }
+  },
 )
 
 /**
@@ -302,7 +313,7 @@ export const sendEmailFn = createServerFn({ method: 'POST' })
       htmlBody?: string
       inReplyTo?: string
       references?: string[]
-    }) => data
+    }) => data,
   )
   .handler(async ({ data }) => {
     const { client, accountId } = await getAuthenticatedClient()
@@ -325,7 +336,9 @@ export const sendEmailFn = createServerFn({ method: 'POST' })
       mailboxIds[drafts.id] = true
     }
 
-    const emailData: Parameters<typeof EmailSubmissionMethods.createAndSend>[2]['email'] = {
+    const emailData: Parameters<
+      typeof EmailSubmissionMethods.createAndSend
+    >[2]['email'] = {
       mailboxIds,
       from: [{ name: identity.name, email: identity.email }],
       to: data.to,
@@ -343,14 +356,19 @@ export const sendEmailFn = createServerFn({ method: 'POST' })
       emailData.textBody = [{ value: data.textBody, type: 'text/plain' }]
     }
 
-    const result = await EmailSubmissionMethods.createAndSend(client, accountId, {
-      identityId: data.identityId,
-      email: emailData,
-    })
+    const result = await EmailSubmissionMethods.createAndSend(
+      client,
+      accountId,
+      {
+        identityId: data.identityId,
+        email: emailData,
+      },
+    )
 
     if (result.emailResult.notCreated?.email) {
       throw new Error(
-        result.emailResult.notCreated.email.description || 'Failed to create email'
+        result.emailResult.notCreated.email.description ||
+          'Failed to create email',
       )
     }
 
@@ -370,7 +388,7 @@ export const saveDraftFn = createServerFn({ method: 'POST' })
       textBody?: string
       htmlBody?: string
       draftId?: string // For updating existing draft
-    }) => data
+    }) => data,
   )
   .handler(async ({ data }) => {
     const { client, accountId } = await getAuthenticatedClient()
@@ -414,7 +432,9 @@ export const saveDraftFn = createServerFn({ method: 'POST' })
     const result = await EmailMethods.createDraft(client, accountId, draft)
 
     if (result.notCreated?.draft) {
-      throw new Error(result.notCreated.draft.description || 'Failed to save draft')
+      throw new Error(
+        result.notCreated.draft.description || 'Failed to save draft',
+      )
     }
 
     return {
