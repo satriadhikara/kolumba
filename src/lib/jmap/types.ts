@@ -63,6 +63,7 @@ export type MethodResponse = [string, Record<string, unknown>, string]
 export interface JMAPError {
   type: string
   description?: string
+  properties?: string[]
 }
 
 // =============================================================================
