@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { JMAPKeywords, type Email } from '@/lib/jmap/types'
 import { toggleStarFn, deleteEmailFn, archiveEmailFn } from '@/server/jmap'
+import { useEffect, useState } from 'react'
 
 interface MessageViewProps {
   email: Email
@@ -88,6 +89,64 @@ export function MessageView({ email }: MessageViewProps) {
   const params = useParams({ from: '/_authed/mail/$mailboxId/$messageId' })
   const isStarred = email.keywords[JMAPKeywords.FLAGGED]
   const { html, text } = getEmailBody(email)
+
+  // Track theme state
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    return document.documentElement.classList.contains('dark')
+  })
+
+  // Listen for theme changes
+  useEffect(() => {
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.attributeName === 'class') {
+          setIsDarkMode(document.documentElement.classList.contains('dark'))
+        }
+      })
+    })
+
+    observer.observe(document.documentElement, { attributes: true })
+    return () => observer.disconnect()
+  }, [])
+
+  // Generate theme-aware iframe styles
+  const iframeStyles = isDarkMode
+    ? `
+        body {
+          font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+          font-size: 14px;
+          line-height: 1.6;
+          color: #e5e5e5;
+          background: #0a0a0a;
+          margin: 0;
+          padding: 0;
+        }
+        img { max-width: 100%; height: auto; }
+        a { color: #818cf8; text-decoration: underline; }
+        blockquote { border-left: 3px solid #333; padding-left: 1em; margin-left: 0; }
+        pre { background: #1a1a1a; padding: 1em; border-radius: 4px; overflow-x: auto; }
+        code { background: #1a1a1a; padding: 0.2em 0.4em; border-radius: 3px; font-size: 0.9em; }
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #333; padding: 8px; text-align: left; }
+      `
+    : `
+        body {
+          font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+          font-size: 14px;
+          line-height: 1.6;
+          color: #1a1a1a;
+          background: #ffffff;
+          margin: 0;
+          padding: 0;
+        }
+        img { max-width: 100%; height: auto; }
+        a { color: #4f46e5; text-decoration: underline; }
+        blockquote { border-left: 3px solid #e5e5e5; padding-left: 1em; margin-left: 0; }
+        pre { background: #f5f5f5; padding: 1em; border-radius: 4px; overflow-x: auto; }
+        code { background: #f5f5f5; padding: 0.2em 0.4em; border-radius: 3px; font-size: 0.9em; }
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #e5e5e5; padding: 8px; text-align: left; }
+      `
 
   const handleToggleStar = async () => {
     await toggleStarFn({ data: { emailId: email.id, starred: !isStarred } })
@@ -269,20 +328,7 @@ export function MessageView({ email }: MessageViewProps) {
                       <meta charset="utf-8">
                       <meta name="viewport" content="width=device-width, initial-scale=1">
                       <style>
-                        body {
-                          font-family: system-ui, -apple-system, sans-serif;
-                          font-size: 14px;
-                          line-height: 1.6;
-                          color: #333;
-                          margin: 0;
-                          padding: 0;
-                        }
-                        img { max-width: 100%; height: auto; }
-                        a { color: #6366f1; }
-                        @media (prefers-color-scheme: dark) {
-                          body { color: #e5e7eb; background: transparent; }
-                          a { color: #818cf8; }
-                        }
+                        ${iframeStyles}
                       </style>
                     </head>
                     <body>${html}</body>
@@ -293,7 +339,7 @@ export function MessageView({ email }: MessageViewProps) {
                 title="Email content"
               />
             ) : text ? (
-              <pre className="whitespace-pre-wrap font-sans text-sm">
+              <pre className="whitespace-pre-wrap font-sans text-sm text-foreground">
                 {text}
               </pre>
             ) : (
