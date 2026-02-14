@@ -144,52 +144,54 @@ export function MessageListItem({ email }: MessageListItemProps) {
           {email.subject || '(No subject)'}
         </div>
 
-        <div className="group-hover:hidden truncate text-sm text-muted-foreground">
-          {email.preview}
-        </div>
+        <div className="relative flex items-center">
+          <div className="truncate text-sm text-muted-foreground flex-1 group-hover:[mask-image:linear-gradient(to_right,black_0%,black_60%,transparent_100%)]">
+            {email.preview}
+          </div>
 
-        <div className="hidden group-hover:flex gap-1">
-          <button
-            onClick={handleToggleStar}
-            className={cn(
-              'p-1.5 rounded-md transition-colors',
-              'hover:bg-background',
-              isStarred && 'text-yellow-500',
-            )}
-            title={isStarred ? 'Unstar' : 'Star'}
-          >
-            <HugeiconsIcon
-              icon={StarIcon}
-              className={cn('h-4 w-4', isStarred && 'fill-current')}
-            />
-          </button>
+          {/* Actions overlay on hover */}
+          <div className="hidden group-hover:flex items-center gap-0.5 absolute right-0 top-0 bottom-0 pl-8 bg-gradient-to-r from-transparent via-background/80 to-background">
+            <button
+              onClick={handleToggleStar}
+              className={cn(
+                'p-1.5 rounded-md transition-colors hover:bg-accent',
+                isStarred && 'text-yellow-500',
+              )}
+              title={isStarred ? 'Unstar' : 'Star'}
+            >
+              <HugeiconsIcon
+                icon={StarIcon}
+                className={cn('h-4 w-4', isStarred && 'fill-current')}
+              />
+            </button>
 
-          <button
-            onClick={handleToggleRead}
-            className="p-1.5 rounded-md hover:bg-background transition-colors"
-            title={isRead ? 'Mark as unread' : 'Mark as read'}
-          >
-            <HugeiconsIcon
-              icon={isRead ? MailIcon : MailOpen01Icon}
-              className="h-4 w-4"
-            />
-          </button>
+            <button
+              onClick={handleToggleRead}
+              className="p-1.5 rounded-md hover:bg-accent transition-colors"
+              title={isRead ? 'Mark as unread' : 'Mark as read'}
+            >
+              <HugeiconsIcon
+                icon={isRead ? MailIcon : MailOpen01Icon}
+                className="h-4 w-4"
+              />
+            </button>
 
-          <button
-            onClick={handleArchive}
-            className="p-1.5 rounded-md hover:bg-background transition-colors"
-            title="Archive"
-          >
-            <HugeiconsIcon icon={Archive02Icon} className="h-4 w-4" />
-          </button>
+            <button
+              onClick={handleArchive}
+              className="p-1.5 rounded-md hover:bg-accent transition-colors"
+              title="Archive"
+            >
+              <HugeiconsIcon icon={Archive02Icon} className="h-4 w-4" />
+            </button>
 
-          <button
-            onClick={handleDelete}
-            className="p-1.5 rounded-md hover:bg-background hover:text-destructive transition-colors"
-            title="Delete"
-          >
-            <HugeiconsIcon icon={Delete02Icon} className="h-4 w-4" />
-          </button>
+            <button
+              onClick={handleDelete}
+              className="p-1.5 rounded-md hover:bg-accent hover:text-destructive transition-colors"
+              title="Delete"
+            >
+              <HugeiconsIcon icon={Delete02Icon} className="h-4 w-4" />
+            </button>
+          </div>
         </div>
       </div>
     </Link>
