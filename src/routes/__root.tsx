@@ -8,8 +8,18 @@ import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
 
 import appCss from '../styles.css?url'
+import type { Theme } from '@/server/theme'
+import { getThemeFromCookie } from '@/server/theme'
+
+export type RootRouteContext = {
+  theme: Theme
+}
 
 export const Route = createRootRoute({
+  beforeLoad: () => {
+    const theme = getThemeFromCookie()
+    return { theme }
+  },
   head: () => ({
     meta: [
       {
@@ -44,8 +54,11 @@ function RootComponent() {
 }
 
 function RootDocument({ children }: { children: React.ReactNode }) {
+  const rootRoute = Route.useRouteContext()
+  const theme = (rootRoute as RootRouteContext | undefined)?.theme ?? 'light'
+
   return (
-    <html lang="en">
+    <html lang="en" className={theme === 'dark' ? 'dark' : ''}>
       <head>
         <HeadContent />
       </head>
