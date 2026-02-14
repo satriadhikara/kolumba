@@ -381,11 +381,16 @@ export const sendEmailFn = createServerFn({ method: 'POST' })
       emailData.htmlBody = [{ partId: htmlPartId }]
     }
 
+    if (!sent) {
+      throw new Error('Sent mailbox not found')
+    }
+
     const result = await EmailSubmissionMethods.createAndSend(
       client,
       accountId,
       {
         identityId: data.identityId,
+        sentMailboxId: sent.id,
         email: emailData,
       },
     )
@@ -394,6 +399,13 @@ export const sendEmailFn = createServerFn({ method: 'POST' })
       throw new Error(
         result.emailResult.notCreated.email.description ||
           'Failed to create email',
+      )
+    }
+
+    if (result.submissionResult.notCreated?.submission) {
+      throw new Error(
+        result.submissionResult.notCreated.submission.description ||
+          'Failed to send email',
       )
     }
 

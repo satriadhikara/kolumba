@@ -395,6 +395,7 @@ export const EmailSubmissionMethods = {
     accountId: string,
     options: {
       identityId: string
+      sentMailboxId: string
       email: {
         mailboxIds: Record<string, boolean>
         from: { name?: string; email: string }[]
@@ -435,6 +436,7 @@ export const EmailSubmissionMethods = {
       },
       onSuccessUpdateEmail: {
         '#submission': {
+          [`mailboxIds/${options.sentMailboxId}`]: true,
           [`mailboxIds/${Object.keys(options.email.mailboxIds)[0]}`]: null,
           'keywords/$draft': null,
           'keywords/$seen': true,
