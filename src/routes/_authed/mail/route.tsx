@@ -1,19 +1,25 @@
 import { useState } from 'react'
-import { createFileRoute, Outlet, Link, useRouterState } from '@tanstack/react-router'
+import {
+  Link,
+  Outlet,
+  createFileRoute,
+  useRouterState,
+} from '@tanstack/react-router'
 import { HugeiconsIcon } from '@hugeicons/react'
 import {
+  LogoutIcon,
+  MoonIcon,
   PlusSignIcon,
   Search01Icon,
-  LogoutIcon,
   SunIcon,
-  MoonIcon,
 } from '@hugeicons/core-free-icons'
+import type { EmailListItem } from '@/lib/jmap/types'
 import { getMailboxesFn } from '@/server/jmap'
 import { logoutFn } from '@/server/auth'
+import { setThemeFn } from '@/server/theme'
 import { MailboxList } from '@/components/mail/mailbox-list'
 import { Search } from '@/components/mail/search'
 import { Button } from '@/components/ui/button'
-import type { EmailListItem } from '@/lib/jmap/types'
 
 export const Route = createFileRoute('/_authed/mail')({
   loader: async () => {
@@ -25,10 +31,9 @@ export const Route = createFileRoute('/_authed/mail')({
 
 function MailLayout() {
   const { mailboxes } = Route.useLoaderData()
-  const { session } = Route.useRouteContext()
+  const { session, theme } = Route.useRouteContext()
   const [showSearch, setShowSearch] = useState(false)
-  const [, setSearchResults] = useState<EmailListItem[] | null>(null)
-  const [isDark, setIsDark] = useState(false)
+  const [, setSearchResults] = useState<Array<EmailListItem> | null>(null)
   const pathname = useRouterState({
     select: (state) => state.location.pathname,
   })
@@ -38,12 +43,13 @@ function MailLayout() {
     await logoutFn()
   }
 
-  const toggleDarkMode = () => {
-    setIsDark(!isDark)
-    document.documentElement.classList.toggle('dark')
+  const toggleDarkMode = async () => {
+    const newTheme = theme === 'dark' ? 'light' : 'dark'
+    await setThemeFn({ data: { theme: newTheme } })
+    window.location.reload()
   }
 
-  const handleSearchResults = (emails: EmailListItem[] | null) => {
+  const handleSearchResults = (emails: Array<EmailListItem> | null) => {
     setSearchResults(emails)
   }
 
@@ -61,7 +67,10 @@ function MailLayout() {
         {/* Search */}
         <div className="flex-1 max-w-md">
           {showSearch ? (
-            <Search onResults={handleSearchResults} onClose={handleSearchClose} />
+            <Search
+              onResults={handleSearchResults}
+              onClose={handleSearchClose}
+            />
           ) : (
             <Button
               variant="outline"
@@ -78,7 +87,7 @@ function MailLayout() {
           {/* Dark mode toggle */}
           <Button variant="ghost" size="icon" onClick={toggleDarkMode}>
             <HugeiconsIcon
-              icon={isDark ? SunIcon : MoonIcon}
+              icon={theme === 'dark' ? SunIcon : MoonIcon}
               className="h-4 w-4"
             />
           </Button>
