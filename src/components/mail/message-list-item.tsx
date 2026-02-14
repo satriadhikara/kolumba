@@ -192,13 +192,6 @@ export function MessageListItem({ email }: MessageListItemProps) {
           </button>
         </div>
       </div>
-
-      {/* Star indicator (visible when starred and not hovered) */}
-      {isStarred && (
-        <div className="absolute top-3 right-3 text-yellow-500 group-hover:hidden">
-          <HugeiconsIcon icon={StarIcon} className="h-4 w-4 fill-current" />
-        </div>
-      )}
     </Link>
   )
 }
