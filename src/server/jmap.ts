@@ -349,25 +349,18 @@ export const sendEmailFn = createServerFn({ method: 'POST' })
       references: data.references,
     }
 
-    if (data.htmlBody) {
-      emailData.htmlBody = [{ value: data.htmlBody, type: 'text/html' }]
-    }
-    if (data.textBody) {
-      emailData.textBody = [{ value: data.textBody, type: 'text/plain' }]
-    }
-
-    const bodyValues: Record<string, { value: string; type: string }> = {}
+    const bodyValues: Record<string, { value: string }> = {}
     let textPartId: string | undefined
     let htmlPartId: string | undefined
 
     if (data.textBody) {
       const partId = 'text'
-      bodyValues[partId] = { value: data.textBody, type: 'text/plain' }
+      bodyValues[partId] = { value: data.textBody }
       textPartId = partId
     }
     if (data.htmlBody) {
       const partId = htmlPartId || 'html'
-      bodyValues[partId] = { value: data.htmlBody, type: 'text/html' }
+      bodyValues[partId] = { value: data.htmlBody }
       htmlPartId = partId
     }
 
