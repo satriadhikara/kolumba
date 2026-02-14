@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { createFileRoute, Outlet, Link, useRouter } from '@tanstack/react-router'
+import { createFileRoute, Outlet, Link, useRouterState } from '@tanstack/react-router'
 import { HugeiconsIcon } from '@hugeicons/react'
 import {
   PlusSignIcon,
@@ -24,12 +24,15 @@ export const Route = createFileRoute('/_authed/mail')({
 })
 
 function MailLayout() {
-  const router = useRouter()
   const { mailboxes } = Route.useLoaderData()
   const { session } = Route.useRouteContext()
   const [showSearch, setShowSearch] = useState(false)
-  const [searchResults, setSearchResults] = useState<EmailListItem[] | null>(null)
+  const [, setSearchResults] = useState<EmailListItem[] | null>(null)
   const [isDark, setIsDark] = useState(false)
+  const pathname = useRouterState({
+    select: (state) => state.location.pathname,
+  })
+  const isComposeRoute = pathname === '/mail/compose'
 
   const handleLogout = async () => {
     await logoutFn()
@@ -106,12 +109,12 @@ function MailLayout() {
             </Link>
           </div>
 
-          <MailboxList mailboxes={mailboxes} />
+          {!isComposeRoute && <MailboxList mailboxes={mailboxes} />}
         </aside>
 
         {/* Content area */}
         <main className="flex-1 flex min-w-0">
-          <Outlet context={{ searchResults }} />
+          <Outlet />
         </main>
       </div>
     </div>

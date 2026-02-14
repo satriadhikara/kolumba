@@ -1,4 +1,4 @@
-import { Link, useParams } from '@tanstack/react-router'
+import { Link, useRouterState } from '@tanstack/react-router'
 import { HugeiconsIcon } from '@hugeicons/react'
 import {
   InboxIcon,
@@ -11,7 +11,7 @@ import {
   FolderIcon,
 } from '@hugeicons/core-free-icons'
 import { cn } from '@/lib/utils'
-import type { Mailbox, MailboxRole } from '@/lib/jmap/types'
+import type { Mailbox } from '@/lib/jmap/types'
 
 interface MailboxListProps {
   mailboxes: Mailbox[]
@@ -37,8 +37,16 @@ const roleOrder: string[] = [
 ]
 
 export function MailboxList({ mailboxes }: MailboxListProps) {
-  const params = useParams({ from: '/_authed/mail/$mailboxId' })
-  const currentMailboxId = params.mailboxId
+  const currentMailboxId = useRouterState({
+    select: (state) => {
+      const mailboxMatch = state.matches.find(
+        (match) => match.routeId === '/_authed/mail/$mailboxId'
+      )
+      return typeof mailboxMatch?.params?.mailboxId === 'string'
+        ? mailboxMatch.params.mailboxId
+        : ''
+    },
+  })
 
   // Sort mailboxes: standard roles first (in order), then custom folders alphabetically
   const sortedMailboxes = [...mailboxes].sort((a, b) => {
@@ -52,9 +60,6 @@ export function MailboxList({ mailboxes }: MailboxListProps) {
     if (bRoleIndex >= 0) return 1
     return a.name.localeCompare(b.name)
   })
-
-  // Find the inbox mailbox ID for the "inbox" route
-  const inboxMailbox = mailboxes.find((m) => m.role === 'inbox')
 
   return (
     <nav className="flex-1 overflow-y-auto py-2">
