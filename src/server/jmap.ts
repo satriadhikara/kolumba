@@ -389,16 +389,22 @@ export const sendEmailFn = createServerFn({ method: 'POST' })
     )
 
     if (result.emailResult.notCreated?.email) {
+      const error = result.emailResult.notCreated.email
       throw new Error(
-        result.emailResult.notCreated.email.description ||
-          'Failed to create email',
+        error.description +
+          (error.properties
+            ? ` (Failed properties: ${error.properties.join(', ')})`
+            : '') || 'Failed to create email',
       )
     }
 
     if (result.submissionResult.notCreated?.submission) {
+      const error = result.submissionResult.notCreated.submission
       throw new Error(
-        result.submissionResult.notCreated.submission.description ||
-          'Failed to send email',
+        error.description +
+          (error.properties
+            ? ` (Failed properties: ${error.properties.join(', ')})`
+            : '') || 'Failed to send email',
       )
     }
 
