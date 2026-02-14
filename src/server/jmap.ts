@@ -356,6 +356,31 @@ export const sendEmailFn = createServerFn({ method: 'POST' })
       emailData.textBody = [{ value: data.textBody, type: 'text/plain' }]
     }
 
+    const bodyValues: Record<string, { value: string; type: string }> = {}
+    let textPartId: string | undefined
+    let htmlPartId: string | undefined
+
+    if (data.textBody) {
+      const partId = 'text'
+      bodyValues[partId] = { value: data.textBody, type: 'text/plain' }
+      textPartId = partId
+    }
+    if (data.htmlBody) {
+      const partId = htmlPartId || 'html'
+      bodyValues[partId] = { value: data.htmlBody, type: 'text/html' }
+      htmlPartId = partId
+    }
+
+    if (Object.keys(bodyValues).length > 0) {
+      emailData.bodyValues = bodyValues
+    }
+    if (textPartId) {
+      emailData.textBody = [{ partId: textPartId }]
+    }
+    if (htmlPartId) {
+      emailData.htmlBody = [{ partId: htmlPartId }]
+    }
+
     const result = await EmailSubmissionMethods.createAndSend(
       client,
       accountId,
