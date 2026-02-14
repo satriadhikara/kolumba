@@ -430,7 +430,7 @@ export const EmailSubmissionMethods = {
       create: {
         submission: {
           identityId: options.identityId,
-          emailId: '#email',
+          '#emailId': builder.ref(emailCallId, '/created/email/id'),
         },
       },
       onSuccessUpdateEmail: {
