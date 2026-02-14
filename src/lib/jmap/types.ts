@@ -107,18 +107,18 @@ export interface EmailHeader {
  * Email body part
  */
 export interface EmailBodyPart {
-  partId: string | null
-  blobId: string | null
-  size: number
+  partId?: string | null
+  blobId?: string | null
+  size?: number
   headers?: EmailHeader[]
-  name: string | null
-  type: string
-  charset: string | null
-  disposition: string | null
-  cid: string | null
-  language: string[] | null
-  location: string | null
-  subParts: EmailBodyPart[] | null
+  name?: string | null
+  type?: string
+  charset?: string | null
+  disposition?: string | null
+  cid?: string | null
+  language?: string[] | null
+  location?: string | null
+  subParts?: EmailBodyPart[] | null
 }
 
 /**
@@ -126,8 +126,9 @@ export interface EmailBodyPart {
  */
 export interface EmailBodyValue {
   value: string
-  isEncodingProblem: boolean
-  isTruncated: boolean
+  isEncodingProblem?: boolean
+  isTruncated?: boolean
+  type?: string
 }
 
 /**
