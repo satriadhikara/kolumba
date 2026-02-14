@@ -109,7 +109,7 @@ export function MessageListItem({ email }: MessageListItemProps) {
       className={cn(
         'group relative flex gap-3 px-4 py-3 border-b transition-colors',
         'hover:bg-muted/50',
-        !isRead && 'bg-accent/5'
+        !isRead && 'bg-accent/5',
       )}
     >
       {/* Avatar */}
@@ -118,7 +118,7 @@ export function MessageListItem({ email }: MessageListItemProps) {
           'h-10 w-10 rounded-full flex items-center justify-center shrink-0 text-sm font-medium',
           isRead
             ? 'bg-muted text-muted-foreground'
-            : 'bg-primary text-primary-foreground'
+            : 'bg-primary text-primary-foreground',
         )}
       >
         {getInitials(email.from)}
@@ -127,12 +127,7 @@ export function MessageListItem({ email }: MessageListItemProps) {
       {/* Content */}
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
-          <span
-            className={cn(
-              'truncate',
-              !isRead && 'font-semibold'
-            )}
-          >
+          <span className={cn('truncate', !isRead && 'font-semibold')}>
             {getSenderDisplay(email.from)}
           </span>
           <span className="ml-auto text-xs text-muted-foreground shrink-0">
@@ -143,68 +138,67 @@ export function MessageListItem({ email }: MessageListItemProps) {
         <div
           className={cn(
             'truncate text-sm',
-            !isRead ? 'text-foreground font-medium' : 'text-foreground'
+            !isRead ? 'text-foreground font-medium' : 'text-foreground',
           )}
         >
           {email.subject || '(No subject)'}
         </div>
 
-        <div className="truncate text-sm text-muted-foreground">
+        <div className="group-hover:hidden truncate text-sm text-muted-foreground">
           {email.preview}
+        </div>
+
+        <div className="hidden group-hover:flex gap-1">
+          <button
+            onClick={handleToggleStar}
+            className={cn(
+              'p-1.5 rounded-md transition-colors',
+              'hover:bg-background',
+              isStarred && 'text-yellow-500',
+            )}
+            title={isStarred ? 'Unstar' : 'Star'}
+          >
+            <HugeiconsIcon
+              icon={StarIcon}
+              className={cn('h-4 w-4', isStarred && 'fill-current')}
+            />
+          </button>
+
+          <button
+            onClick={handleToggleRead}
+            className="p-1.5 rounded-md hover:bg-background transition-colors"
+            title={isRead ? 'Mark as unread' : 'Mark as read'}
+          >
+            <HugeiconsIcon
+              icon={isRead ? MailIcon : MailOpen01Icon}
+              className="h-4 w-4"
+            />
+          </button>
+
+          <button
+            onClick={handleArchive}
+            className="p-1.5 rounded-md hover:bg-background transition-colors"
+            title="Archive"
+          >
+            <HugeiconsIcon icon={Archive02Icon} className="h-4 w-4" />
+          </button>
+
+          <button
+            onClick={handleDelete}
+            className="p-1.5 rounded-md hover:bg-background hover:text-destructive transition-colors"
+            title="Delete"
+          >
+            <HugeiconsIcon icon={Delete02Icon} className="h-4 w-4" />
+          </button>
         </div>
       </div>
 
-      {/* Star indicator (visible when starred) */}
+      {/* Star indicator (visible when starred and not hovered) */}
       {isStarred && (
         <div className="absolute top-3 right-3 text-yellow-500 group-hover:hidden">
           <HugeiconsIcon icon={StarIcon} className="h-4 w-4 fill-current" />
         </div>
       )}
-
-      {/* Hover actions */}
-      <div className="absolute top-2 right-2 hidden gap-1 group-hover:flex">
-        <button
-          onClick={handleToggleStar}
-          className={cn(
-            'p-1.5 rounded-md transition-colors',
-            'hover:bg-background',
-            isStarred && 'text-yellow-500'
-          )}
-          title={isStarred ? 'Unstar' : 'Star'}
-        >
-          <HugeiconsIcon
-            icon={StarIcon}
-            className={cn('h-4 w-4', isStarred && 'fill-current')}
-          />
-        </button>
-
-        <button
-          onClick={handleToggleRead}
-          className="p-1.5 rounded-md hover:bg-background transition-colors"
-          title={isRead ? 'Mark as unread' : 'Mark as read'}
-        >
-          <HugeiconsIcon
-            icon={isRead ? MailIcon : MailOpen01Icon}
-            className="h-4 w-4"
-          />
-        </button>
-
-        <button
-          onClick={handleArchive}
-          className="p-1.5 rounded-md hover:bg-background transition-colors"
-          title="Archive"
-        >
-          <HugeiconsIcon icon={Archive02Icon} className="h-4 w-4" />
-        </button>
-
-        <button
-          onClick={handleDelete}
-          className="p-1.5 rounded-md hover:bg-background hover:text-destructive transition-colors"
-          title="Delete"
-        >
-          <HugeiconsIcon icon={Delete02Icon} className="h-4 w-4" />
-        </button>
-      </div>
     </Link>
   )
 }
