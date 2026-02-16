@@ -10,10 +10,10 @@ import {
   StarIcon,
 } from '@hugeicons/core-free-icons'
 import { useEffect, useState } from 'react'
-import type {Email} from '@/lib/jmap/types';
+import type { Email } from '@/lib/jmap/types'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
-import {  JMAPKeywords } from '@/lib/jmap/types'
+import { JMAPKeywords } from '@/lib/jmap/types'
 import { archiveEmailFn, deleteEmailFn, toggleStarFn } from '@/server/jmap'
 
 interface MessageViewProps {

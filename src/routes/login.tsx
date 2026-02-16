@@ -1,6 +1,5 @@
 import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
-import { useServerFn } from '@tanstack/react-start'
 import { getSessionFn, loginFn } from '@/server/auth'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -35,12 +34,11 @@ function LoginPage() {
     setIsLoading(true)
 
     const formData = new FormData(e.currentTarget)
-    const jmapUrl = formData.get('jmapUrl') as string
     const username = formData.get('username') as string
     const password = formData.get('password') as string
 
     try {
-      const result = await loginFn({ data: { jmapUrl, username, password } })
+      const result = await loginFn({ data: { username, password } })
 
       if (result.error) {
         setError(result.error)
@@ -65,21 +63,6 @@ function LoginPage() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="jmapUrl">Mail Server URL</Label>
-              <Input
-                id="jmapUrl"
-                name="jmapUrl"
-                type="url"
-                placeholder="https://mail.example.com"
-                required
-                autoComplete="url"
-              />
-              <p className="text-xs text-muted-foreground">
-                The URL of your Stalwart JMAP server
-              </p>
-            </div>
-
             <div className="space-y-2">
               <Label htmlFor="username">Username</Label>
               <Input

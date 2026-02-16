@@ -5,8 +5,8 @@
 
 import { createServerFn } from '@tanstack/react-start'
 import { redirect } from '@tanstack/react-router'
-import {  isSessionValid, useAppSession } from './session'
-import type {SessionData} from './session';
+import { isSessionValid, useAppSession } from './session'
+import type { SessionData } from './session'
 import { JMAPClientError, discoverJMAPSession } from '@/lib/jmap/client'
 
 /**
@@ -14,11 +14,14 @@ import { JMAPClientError, discoverJMAPSession } from '@/lib/jmap/client'
  * Validates credentials by fetching JMAP session, then stores session data
  */
 export const loginFn = createServerFn({ method: 'POST' })
-  .inputValidator(
-    (data: { jmapUrl: string; username: string; password: string }) => data,
-  )
+  .inputValidator((data: { username: string; password: string }) => data)
   .handler(async ({ data }) => {
-    const { jmapUrl, username, password } = data
+    const { username, password } = data
+
+    const jmapUrl = process.env.JMAP_URL
+    if (!jmapUrl) {
+      return { error: 'JMAP_URL environment variable is not configured' }
+    }
 
     // Create Basic auth token
     const accessToken = btoa(`${username}:${password}`)

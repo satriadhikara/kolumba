@@ -3,32 +3,28 @@
  * Typed helpers for common JMAP method calls
  */
 
+import { JMAPRequestBuilder, createJMAPClient } from './client'
 import {
-  
-  
-  JMAPRequestBuilder,
-  createJMAPClient
-} from './client'
-import {
-  
-  
   EMAIL_FULL_PROPERTIES,
   EMAIL_LIST_PROPERTIES,
-  
-  
-  
-  
-  
-  
-  JMAPCapabilities
-  
-  
-  
-  
-  
+  JMAPCapabilities,
 } from './types'
-import type {JMAPClient, JMAPHttpOptions} from './client';
-import type {ChangesResult, Comparator, Email, EmailFilter, EmailListItem, EmailSubmission, GetResult, Identity, Keywords, Mailbox, QueryResult, ResultReference, SetResult} from './types';
+import type { JMAPClient, JMAPHttpOptions } from './client'
+import type {
+  ChangesResult,
+  Comparator,
+  Email,
+  EmailFilter,
+  EmailListItem,
+  EmailSubmission,
+  GetResult,
+  Identity,
+  Keywords,
+  Mailbox,
+  QueryResult,
+  ResultReference,
+  SetResult,
+} from './types'
 
 /**
  * Mailbox methods

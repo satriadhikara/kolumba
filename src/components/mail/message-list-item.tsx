@@ -1,4 +1,9 @@
-import { Link, useParams, useRouter, useRouterState  } from '@tanstack/react-router'
+import {
+  Link,
+  useParams,
+  useRouter,
+  useRouterState,
+} from '@tanstack/react-router'
 import { HugeiconsIcon } from '@hugeicons/react'
 import {
   Archive02Icon,
@@ -7,9 +12,9 @@ import {
   MailOpen01Icon,
   StarIcon,
 } from '@hugeicons/core-free-icons'
-import type {EmailListItem} from '@/lib/jmap/types';
+import type { EmailListItem } from '@/lib/jmap/types'
 import { cn } from '@/lib/utils'
-import {  JMAPKeywords } from '@/lib/jmap/types'
+import { JMAPKeywords } from '@/lib/jmap/types'
 import {
   archiveEmailFn,
   deleteEmailFn,
