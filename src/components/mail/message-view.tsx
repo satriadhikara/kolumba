@@ -90,17 +90,32 @@ export function MessageView({ email }: MessageViewProps) {
   const isStarred = email.keywords[JMAPKeywords.FLAGGED]
   const { html, text } = getEmailBody(email)
 
-  // Track theme state
+  // Track theme state - initialize from localStorage, fallback to system preference
   const [isDarkMode, setIsDarkMode] = useState(() => {
-    return document.documentElement.classList.contains('dark')
+    if (typeof window === 'undefined') return false
+    const stored = localStorage.getItem('theme')
+    if (stored) return stored === 'dark'
+    return window.matchMedia('(prefers-color-scheme: dark)').matches
   })
 
   // Listen for theme changes
   useEffect(() => {
+    // Check dark mode state - prefer localStorage, fallback to class
+    const checkDarkMode = () => {
+      const stored = localStorage.getItem('theme')
+      if (stored) {
+        setIsDarkMode(stored === 'dark')
+      } else {
+        setIsDarkMode(document.documentElement.classList.contains('dark'))
+      }
+    }
+
+    checkDarkMode()
+
     const observer = new MutationObserver((mutations) => {
       mutations.forEach((mutation) => {
         if (mutation.attributeName === 'class') {
-          setIsDarkMode(document.documentElement.classList.contains('dark'))
+          checkDarkMode()
         }
       })
     })

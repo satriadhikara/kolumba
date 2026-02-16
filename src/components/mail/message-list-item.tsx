@@ -1,4 +1,4 @@
-import { Link, useParams } from '@tanstack/react-router'
+import { Link, useParams, useRouterState } from '@tanstack/react-router'
 import { HugeiconsIcon } from '@hugeicons/react'
 import {
   StarIcon,
@@ -67,8 +67,17 @@ function getInitials(from: EmailListItem['from']): string {
 export function MessageListItem({ email }: MessageListItemProps) {
   const router = useRouter()
   const params = useParams({ from: '/_authed/mail/$mailboxId' })
+  const currentMessageId = useRouterState({
+    select: (state) => {
+      const msgMatch = state.matches.find(
+        (m) => m.routeId === '/_authed/mail/$mailboxId/$messageId',
+      )
+      return msgMatch?.params?.messageId as string | undefined
+    },
+  })
   const isRead = email.keywords[JMAPKeywords.SEEN]
   const isStarred = email.keywords[JMAPKeywords.FLAGGED]
+  const isSelected = currentMessageId === email.id
 
   const handleToggleStar = async (e: React.MouseEvent) => {
     e.preventDefault()
@@ -109,6 +118,7 @@ export function MessageListItem({ email }: MessageListItemProps) {
       className={cn(
         'group relative flex gap-3 px-4 py-3 border-b transition-colors',
         'hover:bg-muted/50',
+        isSelected && 'border-l-2 border-l-accent bg-muted/30',
         !isRead && 'bg-accent/5',
       )}
     >

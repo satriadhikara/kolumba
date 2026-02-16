@@ -1,5 +1,10 @@
-import { useState } from 'react'
-import { createFileRoute, Outlet, Link, useRouterState } from '@tanstack/react-router'
+import { useState, useEffect } from 'react'
+import {
+  createFileRoute,
+  Outlet,
+  Link,
+  useRouterState,
+} from '@tanstack/react-router'
 import { HugeiconsIcon } from '@hugeicons/react'
 import {
   PlusSignIcon,
@@ -28,19 +33,29 @@ function MailLayout() {
   const { session } = Route.useRouteContext()
   const [showSearch, setShowSearch] = useState(false)
   const [, setSearchResults] = useState<EmailListItem[] | null>(null)
-  const [isDark, setIsDark] = useState(false)
+  const [isDark, setIsDark] = useState(() => {
+    if (typeof window === 'undefined') return false
+    const stored = localStorage.getItem('theme')
+    if (stored) return stored === 'dark'
+    return window.matchMedia('(prefers-color-scheme: dark)').matches
+  })
   const pathname = useRouterState({
     select: (state) => state.location.pathname,
   })
   const isComposeRoute = pathname === '/mail/compose'
+
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', isDark)
+  }, [isDark])
 
   const handleLogout = async () => {
     await logoutFn()
   }
 
   const toggleDarkMode = () => {
-    setIsDark(!isDark)
-    document.documentElement.classList.toggle('dark')
+    const newIsDark = !isDark
+    setIsDark(newIsDark)
+    localStorage.setItem('theme', newIsDark ? 'dark' : 'light')
   }
 
   const handleSearchResults = (emails: EmailListItem[] | null) => {
@@ -61,7 +76,10 @@ function MailLayout() {
         {/* Search */}
         <div className="flex-1 max-w-md">
           {showSearch ? (
-            <Search onResults={handleSearchResults} onClose={handleSearchClose} />
+            <Search
+              onResults={handleSearchResults}
+              onClose={handleSearchClose}
+            />
           ) : (
             <Button
               variant="outline"
