@@ -8,6 +8,8 @@ import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
 
 import appCss from '../styles.css?url'
+import { Toaster } from '@/components/ui/sonner'
+import { ErrorView } from '@/components/error-view'
 
 export const Route = createRootRoute({
   head: () => ({
@@ -34,13 +36,19 @@ export const Route = createRootRoute({
       },
     ],
   }),
-
+  errorComponent: RootError,
+  notFoundComponent: NotFound,
   component: RootComponent,
   shellComponent: RootDocument,
 })
 
 function RootComponent() {
-  return <Outlet />
+  return (
+    <>
+      <Outlet />
+      <ToasterThemeSync />
+    </>
+  )
 }
 
 function RootDocument({ children }: { children: React.ReactNode }) {
@@ -81,4 +89,24 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       </body>
     </html>
   )
+}
+
+function RootError({ error, reset }: { error: Error; reset: () => void }) {
+  return <ErrorView error={error} reset={reset} />
+}
+
+function NotFound() {
+  return (
+    <div className="h-screen flex flex-col items-center justify-center text-center p-6">
+      <h1 className="text-4xl font-bold mb-2">404</h1>
+      <p className="text-lg text-muted-foreground mb-6">Page not found</p>
+      <a href="/mail/inbox" className="text-sm text-primary hover:underline">
+        Go to Inbox
+      </a>
+    </div>
+  )
+}
+
+function ToasterThemeSync() {
+  return <Toaster />
 }

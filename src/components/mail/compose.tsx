@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from '@tanstack/react-router'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { Cancel01Icon, MailSend01Icon } from '@hugeicons/core-free-icons'
+import { toast } from 'sonner'
 import { RichTextEditor } from './rich-text-editor'
 import type { Email, Identity } from '@/lib/jmap/types'
 import { Button } from '@/components/ui/button'
@@ -114,6 +115,7 @@ export function Compose({
         },
       })
 
+      toast.success('Email sent')
       router.invalidate()
       onClose()
     } catch (err) {

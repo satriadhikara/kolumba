@@ -12,6 +12,7 @@ import {
   MailOpen01Icon,
   StarIcon,
 } from '@hugeicons/core-free-icons'
+import { toast } from 'sonner'
 import type { EmailListItem } from '@/lib/jmap/types'
 import { cn } from '@/lib/utils'
 import { JMAPKeywords } from '@/lib/jmap/types'
@@ -91,26 +92,39 @@ export function MessageListItem({ email, isTrash }: MessageListItemProps) {
   const handleToggleStar = async (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
-    await toggleStarFn({ data: { emailId: email.id, starred: !isStarred } })
-    router.invalidate()
+    try {
+      await toggleStarFn({ data: { emailId: email.id, starred: !isStarred } })
+      router.invalidate()
+    } catch {
+      toast.error('Failed to update star')
+    }
   }
 
   const handleToggleRead = async (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
-    if (isRead) {
-      await markAsUnreadFn({ data: { emailId: email.id } })
-    } else {
-      await markAsReadFn({ data: { emailId: email.id } })
+    try {
+      if (isRead) {
+        await markAsUnreadFn({ data: { emailId: email.id } })
+      } else {
+        await markAsReadFn({ data: { emailId: email.id } })
+      }
+      router.invalidate()
+    } catch {
+      toast.error('Failed to update read status')
     }
-    router.invalidate()
   }
 
   const handleArchive = async (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
-    await archiveEmailFn({ data: { emailId: email.id } })
-    router.invalidate()
+    try {
+      await archiveEmailFn({ data: { emailId: email.id } })
+      toast.success('Email archived')
+      router.invalidate()
+    } catch {
+      toast.error('Failed to archive email')
+    }
   }
 
   const handleDelete = async (e: React.MouseEvent) => {
@@ -128,28 +142,38 @@ export function MessageListItem({ email, isTrash }: MessageListItemProps) {
         cancelText: 'Cancel',
         variant: 'destructive',
         onConfirm: async () => {
-          await deleteEmailFn({
-            data: { emailId: email.id, permanent: true },
-          })
-          if (isCurrentEmail) {
-            router.navigate({
-              to: '/mail/$mailboxId',
-              params: { mailboxId: params.mailboxId },
+          try {
+            await deleteEmailFn({
+              data: { emailId: email.id, permanent: true },
             })
-          } else {
-            router.invalidate()
+            toast.success('Email deleted permanently')
+            if (isCurrentEmail) {
+              router.navigate({
+                to: '/mail/$mailboxId',
+                params: { mailboxId: params.mailboxId },
+              })
+            } else {
+              router.invalidate()
+            }
+          } catch {
+            toast.error('Failed to delete email')
           }
         },
       })
     } else {
-      await deleteEmailFn({ data: { emailId: email.id } })
-      if (isCurrentEmail) {
-        router.navigate({
-          to: '/mail/$mailboxId',
-          params: { mailboxId: params.mailboxId },
-        })
-      } else {
-        router.invalidate()
+      try {
+        await deleteEmailFn({ data: { emailId: email.id } })
+        toast.success('Email moved to trash')
+        if (isCurrentEmail) {
+          router.navigate({
+            to: '/mail/$mailboxId',
+            params: { mailboxId: params.mailboxId },
+          })
+        } else {
+          router.invalidate()
+        }
+      } catch {
+        toast.error('Failed to delete email')
       }
     }
   }

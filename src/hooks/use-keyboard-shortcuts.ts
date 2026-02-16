@@ -1,5 +1,6 @@
 import { useCallback, useEffect } from 'react'
 import { useRouter } from '@tanstack/react-router'
+import { toast } from 'sonner'
 import {
   archiveEmailFn,
   deleteEmailFn,
@@ -118,9 +119,10 @@ export function useKeyboardShortcuts(options: KeyboardShortcutsOptions = {}) {
             event.preventDefault()
             try {
               await archiveEmailFn({ data: { emailId: selectedEmail.id } })
+              toast.success('Email archived')
               router.invalidate()
-            } catch (err) {
-              console.error('Failed to archive:', err)
+            } catch {
+              toast.error('Failed to archive email')
             }
           }
           break
@@ -131,9 +133,10 @@ export function useKeyboardShortcuts(options: KeyboardShortcutsOptions = {}) {
             event.preventDefault()
             try {
               await deleteEmailFn({ data: { emailId: selectedEmail.id } })
+              toast.success('Email moved to trash')
               router.invalidate()
-            } catch (err) {
-              console.error('Failed to delete:', err)
+            } catch {
+              toast.error('Failed to delete email')
             }
           }
           break
@@ -147,9 +150,10 @@ export function useKeyboardShortcuts(options: KeyboardShortcutsOptions = {}) {
               await toggleStarFn({
                 data: { emailId: selectedEmail.id, starred: !isStarred },
               })
+              toast.success(isStarred ? 'Unstarred' : 'Starred')
               router.invalidate()
-            } catch (err) {
-              console.error('Failed to toggle star:', err)
+            } catch {
+              toast.error('Failed to update star')
             }
           }
           break
@@ -162,12 +166,14 @@ export function useKeyboardShortcuts(options: KeyboardShortcutsOptions = {}) {
             try {
               if (isRead) {
                 await markAsUnreadFn({ data: { emailId: selectedEmail.id } })
+                toast.success('Marked as unread')
               } else {
                 await markAsReadFn({ data: { emailId: selectedEmail.id } })
+                toast.success('Marked as read')
               }
               router.invalidate()
-            } catch (err) {
-              console.error('Failed to toggle read status:', err)
+            } catch {
+              toast.error('Failed to update read status')
             }
           }
           break

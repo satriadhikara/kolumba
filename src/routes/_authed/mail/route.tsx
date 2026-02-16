@@ -8,18 +8,23 @@ import {
   Search01Icon,
   SunIcon,
 } from '@hugeicons/core-free-icons'
+import { toast } from 'sonner'
 import type { EmailListItem } from '@/lib/jmap/types'
 import { getMailboxesFn } from '@/server/jmap'
 import { logoutFn } from '@/server/auth'
 import { MailboxList } from '@/components/mail/mailbox-list'
 import { Search } from '@/components/mail/search'
 import { Button } from '@/components/ui/button'
+import { Skeleton } from '@/components/ui/skeleton'
+import { ErrorView } from '@/components/error-view'
 
 export const Route = createFileRoute('/_authed/mail')({
   loader: async () => {
     const mailboxes = await getMailboxesFn()
     return { mailboxes }
   },
+  pendingComponent: MailLayoutPending,
+  errorComponent: MailLayoutError,
   component: MailLayout,
 })
 
@@ -40,7 +45,11 @@ function MailLayout() {
   }, [isDark])
 
   const handleLogout = async () => {
-    await logoutFn()
+    try {
+      await logoutFn()
+    } catch {
+      toast.error('Failed to log out')
+    }
   }
 
   const toggleDarkMode = () => {
@@ -124,6 +133,86 @@ function MailLayout() {
         {/* Content area */}
         <main className="flex-1 flex min-w-0">
           <Outlet />
+        </main>
+      </div>
+    </div>
+  )
+}
+
+function MailLayoutPending() {
+  return (
+    <div className="h-screen flex flex-col">
+      {/* Header */}
+      <header className="h-14 border-b flex items-center px-4 shrink-0 gap-4">
+        <h1 className="text-lg font-semibold">Kolumba</h1>
+        <div className="flex-1 max-w-md">
+          <Skeleton className="h-9 w-full" />
+        </div>
+        <div className="flex items-center gap-2">
+          <Skeleton className="h-8 w-8 rounded-full" />
+          <Skeleton className="h-4 w-20" />
+          <Skeleton className="h-8 w-8 rounded-full" />
+        </div>
+      </header>
+
+      <div className="flex-1 flex min-h-0">
+        <aside className="w-56 border-r flex flex-col shrink-0">
+          <div className="p-3">
+            <Skeleton className="h-10 w-full" />
+          </div>
+          <div className="flex-1 overflow-y-auto py-2 px-2">
+            <div className="space-y-1">
+              {[...Array(6)].map((_, i) => (
+                <div
+                  key={i}
+                  className="flex items-center gap-3 rounded-md px-3 py-2"
+                >
+                  <Skeleton className="h-4 w-4" />
+                  <Skeleton className="h-4 flex-1" />
+                  <Skeleton className="h-4 w-6" />
+                </div>
+              ))}
+            </div>
+          </div>
+        </aside>
+        <main className="flex-1 flex min-w-0">
+          <Outlet />
+        </main>
+      </div>
+    </div>
+  )
+}
+
+function MailLayoutError({
+  error,
+  reset,
+}: {
+  error: Error
+  reset: () => void
+}) {
+  return (
+    <div className="h-screen flex flex-col">
+      {/* Header */}
+      <header className="h-14 border-b flex items-center px-4 shrink-0 gap-4">
+        <h1 className="text-lg font-semibold">Kolumba</h1>
+        <div className="flex-1 max-w-md">
+          <Skeleton className="h-9 w-full" />
+        </div>
+        <div className="flex items-center gap-2">
+          <Skeleton className="h-8 w-8 rounded-full" />
+          <Skeleton className="h-4 w-20" />
+          <Skeleton className="h-8 w-8 rounded-full" />
+        </div>
+      </header>
+
+      <div className="flex-1 flex min-h-0">
+        <aside className="w-56 border-r flex flex-col shrink-0">
+          <div className="p-3">
+            <Skeleton className="h-10 w-full" />
+          </div>
+        </aside>
+        <main className="flex-1 flex min-w-0">
+          <ErrorView error={error} reset={reset} />
         </main>
       </div>
     </div>
