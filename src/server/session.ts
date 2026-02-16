@@ -14,6 +14,10 @@ export type SessionData = {
   jmapUrl: string
   /** The JMAP API endpoint from session discovery */
   jmapApiUrl: string
+  /** The upload URL for blob uploads */
+  uploadUrl: string
+  /** The download URL for blob downloads */
+  downloadUrl: string
   /** The primary mail account ID */
   accountId: string
   /** Base64 encoded credentials for Basic auth */
@@ -56,6 +60,8 @@ export function isSessionValid(
   return !!(
     data.jmapUrl &&
     data.jmapApiUrl &&
+    data.uploadUrl &&
+    data.downloadUrl &&
     data.accountId &&
     data.accessToken &&
     data.username

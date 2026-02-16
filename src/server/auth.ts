@@ -38,6 +38,8 @@ export const loginFn = createServerFn({ method: 'POST' })
       await appSession.update({
         jmapUrl,
         jmapApiUrl: apiUrl,
+        uploadUrl: session.uploadUrl,
+        downloadUrl: session.downloadUrl,
         accountId,
         accessToken,
         username: session.username || username,

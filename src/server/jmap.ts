@@ -7,15 +7,7 @@
 import { createServerFn } from '@tanstack/react-start'
 import { redirect } from '@tanstack/react-router'
 import { isSessionValid, useAppSession } from './session'
-import type {
-  Comparator,
-  Email,
-  EmailFilter,
-  EmailListItem,
-  Identity,
-  Keywords,
-  Mailbox,
-} from '@/lib/jmap/types'
+import type { Email, EmailListItem, Identity, Mailbox } from '@/lib/jmap/types'
 import { createJMAPClient, resetCallIdCounter } from '@/lib/jmap/client'
 import {
   EmailMethods,
@@ -40,7 +32,13 @@ async function getAuthenticatedClient() {
     accessToken: session.data.accessToken,
   })
 
-  return { client, accountId: session.data.accountId }
+  return {
+    client,
+    accountId: session.data.accountId,
+    uploadUrl: session.data.uploadUrl,
+    downloadUrl: session.data.downloadUrl,
+    accessToken: session.data.accessToken,
+  }
 }
 
 // =============================================================================
@@ -368,10 +366,10 @@ export const sendEmailFn = createServerFn({ method: 'POST' })
       emailData.bodyValues = bodyValues
     }
     if (textPartId) {
-      emailData.textBody = [{ partId: textPartId }]
+      emailData.textBody = [{ partId: textPartId, type: 'text/plain' }]
     }
     if (htmlPartId) {
-      emailData.htmlBody = [{ partId: htmlPartId }]
+      emailData.htmlBody = [{ partId: htmlPartId, type: 'text/html' }]
     }
 
     if (!sent) {

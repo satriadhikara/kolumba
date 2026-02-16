@@ -5,8 +5,8 @@ import { Cancel01Icon, MailSend01Icon } from '@hugeicons/core-free-icons'
 import type { Email, Identity } from '@/lib/jmap/types'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
+import { RichTextEditor } from './rich-text-editor'
 import { sendEmailFn } from '@/server/jmap'
 
 interface ComposeProps {
@@ -29,12 +29,6 @@ function getForwardSubject(subject: string | null): string {
 }
 
 function formatQuotedText(email: Email): string {
-  const date = new Date(email.receivedAt).toLocaleString('en-US', {
-    dateStyle: 'medium',
-    timeStyle: 'short',
-  })
-  const from = email.from?.[0]?.email || 'Unknown'
-
   let body = ''
   if (email.bodyValues && email.textBody?.[0]?.partId) {
     body = email.bodyValues[email.textBody[0].partId]?.value || ''
@@ -47,7 +41,15 @@ function formatQuotedText(email: Email): string {
     .map((line) => `> ${line}`)
     .join('\n')
 
-  return `\n\nOn ${date}, ${from} wrote:\n${quotedLines}`
+  const date = new Date(email.receivedAt).toLocaleString('en-US', {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+  })
+  const from = email.from?.[0]?.email || 'Unknown'
+
+  return `<br><br><blockquote style="border-left: 3px solid #d4d4d8; padding-left: 1rem; margin-left: 0; color: #71717a;">
+On ${date}, ${from} wrote:<br>${quotedLines.replace(/\n/g, '<br>')}
+</blockquote>`
 }
 
 export function Compose({
@@ -66,43 +68,6 @@ export function Compose({
   const [subject, setSubject] = useState('')
   const [body, setBody] = useState('')
   const [identityId, setIdentityId] = useState(identities[0]?.id || '')
-
-  // Pre-fill fields based on mode
-  useEffect(() => {
-    if (!originalEmail) return
-
-    if (mode === 'reply') {
-      const replyTo = originalEmail.replyTo?.[0] || originalEmail.from?.[0]
-      if (replyTo) setTo(replyTo.email)
-      setSubject(getReplySubject(originalEmail.subject))
-      setBody(formatQuotedText(originalEmail))
-    } else if (mode === 'replyAll') {
-      const replyTo = originalEmail.replyTo?.[0] || originalEmail.from?.[0]
-      if (replyTo) setTo(replyTo.email)
-
-      // Add original To recipients (except self) to CC
-      const myEmails = identities.map((i) => i.email.toLowerCase())
-      const ccRecipients =
-        originalEmail.to
-          ?.filter((addr) => !myEmails.includes(addr.email.toLowerCase()))
-          .map((addr) => addr.email) || []
-
-      if (originalEmail.cc) {
-        ccRecipients.push(
-          ...originalEmail.cc
-            .filter((addr) => !myEmails.includes(addr.email.toLowerCase()))
-            .map((addr) => addr.email),
-        )
-      }
-
-      setCc(ccRecipients.join(', '))
-      setSubject(getReplySubject(originalEmail.subject))
-      setBody(formatQuotedText(originalEmail))
-    } else if (mode === 'forward') {
-      setSubject(getForwardSubject(originalEmail.subject))
-      setBody(formatQuotedText(originalEmail))
-    }
-  }, [originalEmail, mode, identities])
 
   const parseAddresses = (
     input: string,
@@ -135,14 +100,16 @@ export function Compose({
           cc: parseAddresses(cc),
           bcc: parseAddresses(bcc),
           subject,
-          textBody: body,
+          htmlBody: body,
           inReplyTo:
             mode === 'reply' || mode === 'replyAll'
               ? originalEmail?.messageId?.[0]
               : undefined,
           references:
             mode === 'reply' || mode === 'replyAll'
-              ? originalEmail?.references || originalEmail?.messageId
+              ? (originalEmail?.references ??
+                originalEmail?.messageId ??
+                undefined)
               : undefined,
         },
       })
@@ -155,6 +122,42 @@ export function Compose({
       setIsLoading(false)
     }
   }
+
+  // Pre-fill fields based on mode
+  useEffect(() => {
+    if (!originalEmail) return
+
+    if (mode === 'reply') {
+      const replyTo = originalEmail.replyTo?.[0] || originalEmail.from?.[0]
+      if (replyTo) setTo(replyTo.email)
+      setSubject(getReplySubject(originalEmail.subject))
+      setBody(formatQuotedText(originalEmail))
+    } else if (mode === 'replyAll') {
+      const replyTo = originalEmail.replyTo?.[0] || originalEmail.from?.[0]
+      if (replyTo) setTo(replyTo.email)
+
+      const myEmails = identities.map((i) => i.email.toLowerCase())
+      const ccRecipients =
+        originalEmail.to
+          ?.filter((addr) => !myEmails.includes(addr.email.toLowerCase()))
+          .map((addr) => addr.email) || []
+
+      if (originalEmail.cc) {
+        ccRecipients.push(
+          ...originalEmail.cc
+            .filter((addr) => !myEmails.includes(addr.email.toLowerCase()))
+            .map((addr) => addr.email),
+        )
+      }
+
+      setCc(ccRecipients.join(', '))
+      setSubject(getReplySubject(originalEmail.subject))
+      setBody(formatQuotedText(originalEmail))
+    } else if (mode === 'forward') {
+      setSubject(getForwardSubject(originalEmail.subject))
+      setBody(formatQuotedText(originalEmail))
+    }
+  }, [originalEmail, mode, identities])
 
   return (
     <div className="h-full w-full flex flex-col bg-background">
@@ -174,7 +177,10 @@ export function Compose({
       </div>
 
       {/* Form */}
-      <form onSubmit={handleSubmit} className="flex-1 flex flex-col p-4 gap-4">
+      <form
+        onSubmit={handleSubmit}
+        className="flex-1 flex flex-col p-4 gap-4 overflow-y-auto"
+      >
         {/* From (if multiple identities) */}
         {identities.length > 1 && (
           <div className="flex items-center gap-2">
@@ -259,13 +265,13 @@ export function Compose({
           />
         </div>
 
-        {/* Body */}
-        <div className="flex-1 flex flex-col gap-2">
-          <Textarea
+        {/* Body - Rich Text Editor */}
+        <div className="flex-1 flex flex-col min-h-[250px]">
+          <Label className="sr-only">Message</Label>
+          <RichTextEditor
             value={body}
-            onChange={(e) => setBody(e.target.value)}
+            onChange={setBody}
             placeholder="Write your message..."
-            className="flex-1 min-h-[200px] resize-none"
           />
         </div>
 
