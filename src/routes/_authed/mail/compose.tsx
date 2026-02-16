@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { getIdentitiesFn, getEmailFn } from '@/server/jmap'
-import { Compose } from '@/components/mail/compose'
 import type { Email } from '@/lib/jmap/types'
+import { getEmailFn, getIdentitiesFn } from '@/server/jmap'
+import { Compose } from '@/components/mail/compose'
 
 type ComposeSearch = {
   replyTo?: string

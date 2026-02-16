@@ -1,16 +1,16 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from '@tanstack/react-router'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { Cancel01Icon, MailSend01Icon } from '@hugeicons/core-free-icons'
+import type { Email, Identity } from '@/lib/jmap/types'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { sendEmailFn } from '@/server/jmap'
-import type { Email, Identity } from '@/lib/jmap/types'
 
 interface ComposeProps {
-  identities: Identity[]
+  identities: Array<Identity>
   originalEmail: Email | null
   mode: 'new' | 'reply' | 'replyAll' | 'forward'
   onClose: () => void
@@ -106,7 +106,7 @@ export function Compose({
 
   const parseAddresses = (
     input: string,
-  ): { name?: string; email: string }[] => {
+  ): Array<{ name?: string; email: string }> => {
     if (!input.trim()) return []
     return input
       .split(',')
@@ -157,7 +157,7 @@ export function Compose({
   }
 
   return (
-    <div className="h-full flex flex-col bg-background">
+    <div className="h-full w-full flex flex-col bg-background">
       {/* Header */}
       <div className="h-14 border-b flex items-center px-4 shrink-0">
         <h2 className="text-lg font-semibold">
@@ -210,6 +210,7 @@ export function Compose({
             onChange={(e) => setTo(e.target.value)}
             placeholder="recipient@example.com"
             required
+            className="flex-1"
           />
         </div>
 
@@ -224,6 +225,7 @@ export function Compose({
             value={cc}
             onChange={(e) => setCc(e.target.value)}
             placeholder="cc@example.com"
+            className="flex-1"
           />
         </div>
 
@@ -238,6 +240,7 @@ export function Compose({
             value={bcc}
             onChange={(e) => setBcc(e.target.value)}
             placeholder="bcc@example.com"
+            className="flex-1"
           />
         </div>
 
@@ -252,6 +255,7 @@ export function Compose({
             value={subject}
             onChange={(e) => setSubject(e.target.value)}
             placeholder="Subject"
+            className="flex-1"
           />
         </div>
 

@@ -6,23 +6,23 @@
 
 import { createServerFn } from '@tanstack/react-start'
 import { redirect } from '@tanstack/react-router'
-import { useAppSession, isSessionValid } from './session'
-import { createJMAPClient, resetCallIdCounter } from '@/lib/jmap/client'
-import {
-  MailboxMethods,
-  EmailMethods,
-  IdentityMethods,
-  EmailSubmissionMethods,
-} from '@/lib/jmap/methods'
+import { isSessionValid, useAppSession } from './session'
 import type {
-  Mailbox,
+  Comparator,
   Email,
+  EmailFilter,
   EmailListItem,
   Identity,
-  EmailFilter,
-  Comparator,
   Keywords,
+  Mailbox,
 } from '@/lib/jmap/types'
+import { createJMAPClient, resetCallIdCounter } from '@/lib/jmap/client'
+import {
+  EmailMethods,
+  EmailSubmissionMethods,
+  IdentityMethods,
+  MailboxMethods,
+} from '@/lib/jmap/methods'
 
 /**
  * Helper to get authenticated JMAP client
@@ -51,7 +51,7 @@ async function getAuthenticatedClient() {
  * Get all mailboxes
  */
 export const getMailboxesFn = createServerFn({ method: 'GET' }).handler(
-  async (): Promise<Mailbox[]> => {
+  async (): Promise<Array<Mailbox>> => {
     const { client, accountId } = await getAuthenticatedClient()
     const result = await MailboxMethods.getAll(client, accountId)
     return result.list
@@ -119,7 +119,7 @@ export const getEmailsFn = createServerFn({ method: 'GET' })
     async ({
       data,
     }): Promise<{
-      emails: EmailListItem[]
+      emails: Array<EmailListItem>
       total: number
       position: number
     }> => {
@@ -266,7 +266,7 @@ export const searchEmailsFn = createServerFn({ method: 'GET' })
     async ({
       data,
     }): Promise<{
-      emails: EmailListItem[]
+      emails: Array<EmailListItem>
       total: number
     }> => {
       const { client, accountId } = await getAuthenticatedClient()
@@ -291,7 +291,7 @@ export const searchEmailsFn = createServerFn({ method: 'GET' })
  * Get user identities (for from address selection)
  */
 export const getIdentitiesFn = createServerFn({ method: 'GET' }).handler(
-  async (): Promise<Identity[]> => {
+  async (): Promise<Array<Identity>> => {
     const { client, accountId } = await getAuthenticatedClient()
     const result = await IdentityMethods.getAll(client, accountId)
     return result.list
@@ -305,14 +305,14 @@ export const sendEmailFn = createServerFn({ method: 'POST' })
   .inputValidator(
     (data: {
       identityId: string
-      to: { name?: string; email: string }[]
-      cc?: { name?: string; email: string }[]
-      bcc?: { name?: string; email: string }[]
+      to: Array<{ name?: string; email: string }>
+      cc?: Array<{ name?: string; email: string }>
+      bcc?: Array<{ name?: string; email: string }>
       subject: string
       textBody?: string
       htmlBody?: string
       inReplyTo?: string
-      references?: string[]
+      references?: Array<string>
     }) => data,
   )
   .handler(async ({ data }) => {
@@ -417,9 +417,9 @@ export const sendEmailFn = createServerFn({ method: 'POST' })
 export const saveDraftFn = createServerFn({ method: 'POST' })
   .inputValidator(
     (data: {
-      to?: { name?: string; email: string }[]
-      cc?: { name?: string; email: string }[]
-      bcc?: { name?: string; email: string }[]
+      to?: Array<{ name?: string; email: string }>
+      cc?: Array<{ name?: string; email: string }>
+      bcc?: Array<{ name?: string; email: string }>
       subject?: string
       textBody?: string
       htmlBody?: string

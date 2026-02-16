@@ -32,7 +32,7 @@ export function resetCallIdCounter(): void {
  */
 export class JMAPRequestBuilder {
   private using: Set<string> = new Set()
-  private methodCalls: MethodCall[] = []
+  private methodCalls: Array<MethodCall> = []
   private callIds: Map<string, number> = new Map()
 
   constructor() {
@@ -51,7 +51,7 @@ export class JMAPRequestBuilder {
   /**
    * Add multiple capabilities
    */
-  addCapabilities(capabilities: string[]): this {
+  addCapabilities(capabilities: Array<string>): this {
     capabilities.forEach((cap) => this.using.add(cap))
     return this
   }
@@ -63,7 +63,7 @@ export class JMAPRequestBuilder {
   call(
     methodName: string,
     args: Record<string, unknown>,
-    callId?: string
+    callId?: string,
   ): string {
     const id = callId ?? generateCallId()
     this.methodCalls.push([methodName, args, id])
@@ -152,7 +152,7 @@ export class JMAPResponseParser {
   /**
    * Get all responses
    */
-  getAll(): MethodResponse[] {
+  getAll(): Array<MethodResponse> {
     return Array.from(this.responses.values())
   }
 }
@@ -163,7 +163,7 @@ export class JMAPResponseParser {
 export class JMAPClientError extends Error {
   constructor(
     public type: string,
-    public description?: string
+    public description?: string,
   ) {
     super(description ?? type)
     this.name = 'JMAPClientError'
@@ -183,7 +183,7 @@ export interface JMAPHttpOptions {
  */
 export async function executeJMAPRequest(
   request: JMAPRequest,
-  options: JMAPHttpOptions
+  options: JMAPHttpOptions,
 ): Promise<JMAPResponse> {
   const response = await fetch(options.apiUrl, {
     method: 'POST',
@@ -197,7 +197,7 @@ export async function executeJMAPRequest(
   if (!response.ok) {
     throw new JMAPClientError(
       'httpError',
-      `HTTP ${response.status}: ${response.statusText}`
+      `HTTP ${response.status}: ${response.statusText}`,
     )
   }
 
@@ -210,7 +210,7 @@ export async function executeJMAPRequest(
  */
 export async function discoverJMAPSession(
   jmapUrl: string,
-  accessToken: string
+  accessToken: string,
 ): Promise<{
   session: import('./types').JMAPSession
   apiUrl: string
@@ -234,7 +234,7 @@ export async function discoverJMAPSession(
     }
     throw new JMAPClientError(
       'sessionDiscoveryFailed',
-      `Failed to discover JMAP session: HTTP ${response.status}`
+      `Failed to discover JMAP session: HTTP ${response.status}`,
     )
   }
 
@@ -245,7 +245,7 @@ export async function discoverJMAPSession(
   if (!mailAccountId) {
     throw new JMAPClientError(
       'noMailAccount',
-      'No mail account found in session'
+      'No mail account found in session',
     )
   }
 
@@ -276,7 +276,7 @@ export function createJMAPClient(options: JMAPHttpOptions) {
     async call<T = Record<string, unknown>>(
       methodName: string,
       args: Record<string, unknown>,
-      capabilities: string[] = []
+      capabilities: Array<string> = [],
     ): Promise<T> {
       const builder = new JMAPRequestBuilder()
       capabilities.forEach((cap) => builder.addCapability(cap))

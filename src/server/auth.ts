@@ -5,15 +5,18 @@
 
 import { createServerFn } from '@tanstack/react-start'
 import { redirect } from '@tanstack/react-router'
-import { useAppSession, isSessionValid, type SessionData } from './session'
-import { discoverJMAPSession, JMAPClientError } from '@/lib/jmap/client'
+import {  isSessionValid, useAppSession } from './session'
+import type {SessionData} from './session';
+import { JMAPClientError, discoverJMAPSession } from '@/lib/jmap/client'
 
 /**
  * Login to JMAP server
  * Validates credentials by fetching JMAP session, then stores session data
  */
 export const loginFn = createServerFn({ method: 'POST' })
-  .inputValidator((data: { jmapUrl: string; username: string; password: string }) => data)
+  .inputValidator(
+    (data: { jmapUrl: string; username: string; password: string }) => data,
+  )
   .handler(async ({ data }) => {
     const { jmapUrl, username, password } = data
 
@@ -24,7 +27,7 @@ export const loginFn = createServerFn({ method: 'POST' })
       // Discover JMAP session (validates credentials)
       const { session, apiUrl, accountId } = await discoverJMAPSession(
         jmapUrl,
-        accessToken
+        accessToken,
       )
 
       // Store session data in secure cookie
@@ -73,7 +76,7 @@ export const getSessionFn = createServerFn({ method: 'GET' }).handler(
     }
 
     return session.data
-  }
+  },
 )
 
 /**
@@ -89,5 +92,5 @@ export const requireAuthFn = createServerFn({ method: 'GET' }).handler(
     }
 
     return session.data
-  }
+  },
 )

@@ -33,8 +33,8 @@ export interface JMAPAccount {
  * JMAP Request format
  */
 export interface JMAPRequest {
-  using: string[]
-  methodCalls: MethodCall[]
+  using: Array<string>
+  methodCalls: Array<MethodCall>
 }
 
 /**
@@ -47,7 +47,7 @@ export type MethodCall = [string, Record<string, unknown>, string]
  * JMAP Response format
  */
 export interface JMAPResponse {
-  methodResponses: MethodResponse[]
+  methodResponses: Array<MethodResponse>
   sessionState: string
 }
 
@@ -63,7 +63,7 @@ export type MethodResponse = [string, Record<string, unknown>, string]
 export interface JMAPError {
   type: string
   description?: string
-  properties?: string[]
+  properties?: Array<string>
 }
 
 // =============================================================================
@@ -111,15 +111,15 @@ export interface EmailBodyPart {
   partId?: string | null
   blobId?: string | null
   size?: number
-  headers?: EmailHeader[]
+  headers?: Array<EmailHeader>
   name?: string | null
   type?: string
   charset?: string | null
   disposition?: string | null
   cid?: string | null
-  language?: string[] | null
+  language?: Array<string> | null
   location?: string | null
-  subParts?: EmailBodyPart[] | null
+  subParts?: Array<EmailBodyPart> | null
 }
 
 /**
@@ -145,24 +145,24 @@ export interface Email {
   receivedAt: string
 
   // Header fields
-  messageId: string[] | null
-  inReplyTo: string[] | null
-  references: string[] | null
-  sender: EmailAddress[] | null
-  from: EmailAddress[] | null
-  to: EmailAddress[] | null
-  cc: EmailAddress[] | null
-  bcc: EmailAddress[] | null
-  replyTo: EmailAddress[] | null
+  messageId: Array<string> | null
+  inReplyTo: Array<string> | null
+  references: Array<string> | null
+  sender: Array<EmailAddress> | null
+  from: Array<EmailAddress> | null
+  to: Array<EmailAddress> | null
+  cc: Array<EmailAddress> | null
+  bcc: Array<EmailAddress> | null
+  replyTo: Array<EmailAddress> | null
   subject: string | null
   sentAt: string | null
 
   // Body
   bodyStructure?: EmailBodyPart
   bodyValues?: Record<string, EmailBodyValue>
-  textBody?: EmailBodyPart[]
-  htmlBody?: EmailBodyPart[]
-  attachments?: EmailBodyPart[]
+  textBody?: Array<EmailBodyPart>
+  htmlBody?: Array<EmailBodyPart>
+  attachments?: Array<EmailBodyPart>
 
   // Convenience
   hasAttachment: boolean
@@ -178,8 +178,8 @@ export interface EmailListItem {
   mailboxIds: Record<string, boolean>
   keywords: Keywords
   receivedAt: string
-  from: EmailAddress[] | null
-  to: EmailAddress[] | null
+  from: Array<EmailAddress> | null
+  to: Array<EmailAddress> | null
   subject: string | null
   preview: string
   hasAttachment: boolean
@@ -188,7 +188,7 @@ export interface EmailListItem {
 /**
  * Properties to fetch for email list
  */
-export const EMAIL_LIST_PROPERTIES: (keyof Email)[] = [
+export const EMAIL_LIST_PROPERTIES: Array<keyof Email> = [
   'id',
   'threadId',
   'mailboxIds',
@@ -204,7 +204,7 @@ export const EMAIL_LIST_PROPERTIES: (keyof Email)[] = [
 /**
  * Properties to fetch for full email view
  */
-export const EMAIL_FULL_PROPERTIES: (keyof Email)[] = [
+export const EMAIL_FULL_PROPERTIES: Array<keyof Email> = [
   'id',
   'blobId',
   'threadId',
@@ -286,8 +286,8 @@ export interface Identity {
   id: string
   name: string
   email: string
-  replyTo: EmailAddress[] | null
-  bcc: EmailAddress[] | null
+  replyTo: Array<EmailAddress> | null
+  bcc: Array<EmailAddress> | null
   textSignature: string
   htmlSignature: string
   mayDelete: boolean
@@ -305,13 +305,13 @@ export interface EmailSubmission {
   sendAt: string
   undoStatus: 'pending' | 'final' | 'canceled'
   deliveryStatus: Record<string, DeliveryStatus> | null
-  dsnBlobIds: string[]
-  mdnBlobIds: string[]
+  dsnBlobIds: Array<string>
+  mdnBlobIds: Array<string>
 }
 
 export interface EmailSubmissionEnvelope {
   mailFrom: EmailSubmissionAddress
-  rcptTo: EmailSubmissionAddress[]
+  rcptTo: Array<EmailSubmissionAddress>
 }
 
 export interface EmailSubmissionAddress {
@@ -334,7 +334,7 @@ export interface DeliveryStatus {
  */
 export interface EmailFilterCondition {
   inMailbox?: string
-  inMailboxOtherThan?: string[]
+  inMailboxOtherThan?: Array<string>
   before?: string
   after?: string
   minSize?: number
@@ -360,7 +360,7 @@ export interface EmailFilterCondition {
  */
 export interface EmailFilterOperator {
   operator: 'AND' | 'OR' | 'NOT'
-  conditions: (EmailFilterCondition | EmailFilterOperator)[]
+  conditions: Array<EmailFilterCondition | EmailFilterOperator>
 }
 
 export type EmailFilter = EmailFilterCondition | EmailFilterOperator
@@ -382,7 +382,7 @@ export interface QueryResult {
   queryState: string
   canCalculateChanges: boolean
   position: number
-  ids: string[]
+  ids: Array<string>
   total?: number
   limit?: number
 }
@@ -393,8 +393,8 @@ export interface QueryResult {
 export interface GetResult<T> {
   accountId: string
   state: string
-  list: T[]
-  notFound: string[]
+  list: Array<T>
+  notFound: Array<string>
 }
 
 /**
@@ -406,7 +406,7 @@ export interface SetResult<T> {
   newState: string
   created: Record<string, T> | null
   updated: Record<string, T | null> | null
-  destroyed: string[] | null
+  destroyed: Array<string> | null
   notCreated: Record<string, JMAPError> | null
   notUpdated: Record<string, JMAPError> | null
   notDestroyed: Record<string, JMAPError> | null
@@ -420,9 +420,9 @@ export interface ChangesResult {
   oldState: string
   newState: string
   hasMoreChanges: boolean
-  created: string[]
-  updated: string[]
-  destroyed: string[]
+  created: Array<string>
+  updated: Array<string>
+  destroyed: Array<string>
 }
 
 // =============================================================================
@@ -431,14 +431,14 @@ export interface ChangesResult {
 
 export interface GetRequest {
   accountId: string
-  ids?: string[] | null
-  properties?: string[] | null
+  ids?: Array<string> | null
+  properties?: Array<string> | null
 }
 
 export interface QueryRequest {
   accountId: string
   filter?: EmailFilter | null
-  sort?: Comparator[] | null
+  sort?: Array<Comparator> | null
   position?: number
   anchor?: string | null
   anchorOffset?: number
@@ -451,7 +451,7 @@ export interface SetRequest<T> {
   ifInState?: string | null
   create?: Record<string, Partial<T>> | null
   update?: Record<string, Partial<T> | null> | null
-  destroy?: string[] | null
+  destroy?: Array<string> | null
 }
 
 export interface ChangesRequest {

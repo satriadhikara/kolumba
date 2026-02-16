@@ -1,4 +1,4 @@
-import { createFileRoute, Outlet } from '@tanstack/react-router'
+import { Outlet, createFileRoute } from '@tanstack/react-router'
 import { getEmailsFn, getMailboxesFn } from '@/server/jmap'
 import { MessageList } from '@/components/mail/message-list'
 
@@ -20,7 +20,7 @@ export const Route = createFileRoute('/_authed/mail/$mailboxId')({
 
     // Find the current mailbox
     const mailbox = mailboxes.find(
-      (m) => m.id === mailboxId || m.id === params.mailboxId
+      (m) => m.id === mailboxId || m.id === params.mailboxId,
     )
 
     // Fetch emails for this mailbox

@@ -48,6 +48,7 @@ Browser (React) → TanStack Server Functions → Stalwart JMAP API
 ```
 
 This enables deployment on:
+
 - Serverless (Vercel, Cloudflare Workers, AWS Lambda)
 - Traditional VPS (Node/Docker)
 
@@ -108,11 +109,13 @@ Returns session object with capabilities, account IDs, and API URL.
 ### Core JMAP Methods to Implement
 
 **Mailbox operations:**
+
 - `Mailbox/get` - fetch all mailboxes (inbox, sent, drafts, trash, etc.)
 - `Mailbox/query` - search/filter mailboxes
 - `Mailbox/set` - create, update, delete mailboxes
 
 **Email operations:**
+
 - `Email/query` - search/filter emails in a mailbox
 - `Email/get` - fetch full email details (headers, body, attachments)
 - `Email/set` - create drafts, update flags (read/unread, starred), move, delete
@@ -120,6 +123,7 @@ Returns session object with capabilities, account IDs, and API URL.
 - `EmailSubmission/set` - send emails
 
 **Identity:**
+
 - `Identity/get` - get user's send-as identities
 
 ### JMAP Request Format
@@ -128,22 +132,35 @@ All calls go to the API URL from session, as POST with:
 
 ```json
 {
-  "using": [
-    "urn:ietf:params:jmap:core",
-    "urn:ietf:params:jmap:mail"
-  ],
+  "using": ["urn:ietf:params:jmap:core", "urn:ietf:params:jmap:mail"],
   "methodCalls": [
-    ["Email/query", {
-      "accountId": "abc",
-      "filter": { "inMailbox": "inbox-id" },
-      "sort": [{ "property": "receivedAt", "isAscending": false }],
-      "limit": 50
-    }, "call-0"],
-    ["Email/get", {
-      "accountId": "abc",
-      "#ids": { "resultOf": "call-0", "name": "Email/query", "path": "/ids" },
-      "properties": ["id", "from", "to", "subject", "receivedAt", "preview", "keywords"]
-    }, "call-1"]
+    [
+      "Email/query",
+      {
+        "accountId": "abc",
+        "filter": { "inMailbox": "inbox-id" },
+        "sort": [{ "property": "receivedAt", "isAscending": false }],
+        "limit": 50
+      },
+      "call-0"
+    ],
+    [
+      "Email/get",
+      {
+        "accountId": "abc",
+        "#ids": { "resultOf": "call-0", "name": "Email/query", "path": "/ids" },
+        "properties": [
+          "id",
+          "from",
+          "to",
+          "subject",
+          "receivedAt",
+          "preview",
+          "keywords"
+        ]
+      },
+      "call-1"
+    ]
   ]
 }
 ```
@@ -199,6 +216,7 @@ Study mail0 (github.com/Mail-0/Mail-0) for UI/UX patterns. Key elements to adopt
 ## v1 Scope (MVP)
 
 ### Include
+
 - [ ] Login / authentication with Stalwart
 - [ ] Mailbox list (inbox, sent, drafts, trash, spam, custom folders)
 - [ ] Message list with pagination/infinite scroll
@@ -212,6 +230,7 @@ Study mail0 (github.com/Mail-0/Mail-0) for UI/UX patterns. Key elements to adopt
 - [ ] Docker image for self-hosting
 
 ### Defer to Later
+
 - Contacts / address book (JMAP Contacts)
 - Calendar (JMAP Calendars)
 - Advanced filter/rule management
@@ -225,6 +244,7 @@ Study mail0 (github.com/Mail-0/Mail-0) for UI/UX patterns. Key elements to adopt
 ## Deployment Targets
 
 ### Docker (primary)
+
 ```dockerfile
 FROM node:20-alpine AS builder
 # build steps
@@ -234,11 +254,13 @@ EXPOSE 3000
 ```
 
 ### Serverless
+
 - Vercel: zero-config with TanStack Start adapter
 - Cloudflare Workers: via adapter
 - AWS Lambda: via adapter
 
 ### Environment Variables
+
 ```env
 JMAP_URL=https://mail.example.com    # Stalwart JMAP endpoint
 SESSION_SECRET=random-secret-here     # for cookie encryption

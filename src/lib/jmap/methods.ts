@@ -4,29 +4,31 @@
  */
 
 import {
+  
+  
   JMAPRequestBuilder,
-  createJMAPClient,
-  type JMAPClient,
-  type JMAPHttpOptions,
+  createJMAPClient
 } from './client'
 import {
-  JMAPCapabilities,
-  EMAIL_LIST_PROPERTIES,
+  
+  
   EMAIL_FULL_PROPERTIES,
-  type Email,
-  type EmailListItem,
-  type Mailbox,
-  type Identity,
-  type EmailSubmission,
-  type EmailFilter,
-  type Comparator,
-  type GetResult,
-  type SetResult,
-  type QueryResult,
-  type ChangesResult,
-  type Keywords,
-  type ResultReference,
+  EMAIL_LIST_PROPERTIES,
+  
+  
+  
+  
+  
+  
+  JMAPCapabilities
+  
+  
+  
+  
+  
 } from './types'
+import type {JMAPClient, JMAPHttpOptions} from './client';
+import type {ChangesResult, Comparator, Email, EmailFilter, EmailListItem, EmailSubmission, GetResult, Identity, Keywords, Mailbox, QueryResult, ResultReference, SetResult} from './types';
 
 /**
  * Mailbox methods
@@ -57,7 +59,7 @@ export const MailboxMethods = {
   async get(
     client: JMAPClient,
     accountId: string,
-    ids: string[],
+    ids: Array<string>,
   ): Promise<GetResult<Mailbox>> {
     return client.call<GetResult<Mailbox>>('Mailbox/get', { accountId, ids }, [
       JMAPCapabilities.MAIL,
@@ -73,7 +75,7 @@ export const MailboxMethods = {
     options: {
       create?: Record<string, Partial<Mailbox>>
       update?: Record<string, Partial<Mailbox>>
-      destroy?: string[]
+      destroy?: Array<string>
     },
   ): Promise<SetResult<Mailbox>> {
     return client.call<SetResult<Mailbox>>(
@@ -86,7 +88,7 @@ export const MailboxMethods = {
   /**
    * Find mailbox by role
    */
-  findByRole(mailboxes: Mailbox[], role: string): Mailbox | undefined {
+  findByRole(mailboxes: Array<Mailbox>, role: string): Mailbox | undefined {
     return mailboxes.find((m) => m.role === role)
   },
 }
@@ -103,12 +105,12 @@ export const EmailMethods = {
     accountId: string,
     options: {
       filter?: EmailFilter
-      sort?: Comparator[]
+      sort?: Array<Comparator>
       position?: number
       limit?: number
-      properties?: (keyof Email)[]
+      properties?: Array<keyof Email>
     } = {},
-  ): Promise<{ query: QueryResult; emails: EmailListItem[] }> {
+  ): Promise<{ query: QueryResult; emails: Array<EmailListItem> }> {
     const builder = new JMAPRequestBuilder()
     builder.addCapability(JMAPCapabilities.MAIL)
 
@@ -154,8 +156,8 @@ export const EmailMethods = {
   async get(
     client: JMAPClient,
     accountId: string,
-    ids: string[],
-    properties: (keyof Email)[] = EMAIL_FULL_PROPERTIES,
+    ids: Array<string>,
+    properties: Array<keyof Email> = EMAIL_FULL_PROPERTIES,
   ): Promise<GetResult<Email>> {
     const builder = new JMAPRequestBuilder()
     builder.addCapability(JMAPCapabilities.MAIL)
@@ -289,7 +291,7 @@ export const EmailMethods = {
   async destroy(
     client: JMAPClient,
     accountId: string,
-    emailIds: string[],
+    emailIds: Array<string>,
   ): Promise<SetResult<Email>> {
     return client.call<SetResult<Email>>(
       'Email/set',
@@ -309,13 +311,13 @@ export const EmailMethods = {
     accountId: string,
     draft: {
       mailboxIds: Record<string, boolean>
-      from: { name?: string; email: string }[]
-      to: { name?: string; email: string }[]
-      cc?: { name?: string; email: string }[]
-      bcc?: { name?: string; email: string }[]
+      from: Array<{ name?: string; email: string }>
+      to: Array<{ name?: string; email: string }>
+      cc?: Array<{ name?: string; email: string }>
+      bcc?: Array<{ name?: string; email: string }>
       subject: string
-      textBody?: { value: string; type: string }[]
-      htmlBody?: { value: string; type: string }[]
+      textBody?: Array<{ value: string; type: string }>
+      htmlBody?: Array<{ value: string; type: string }>
       keywords?: Keywords
     },
   ): Promise<SetResult<Email>> {
@@ -370,7 +372,7 @@ export const EmailMethods = {
       limit?: number
       inMailbox?: string
     } = {},
-  ): Promise<{ query: QueryResult; emails: EmailListItem[] }> {
+  ): Promise<{ query: QueryResult; emails: Array<EmailListItem> }> {
     const filter: EmailFilter = { text }
     if (options.inMailbox) {
       ;(filter as any).inMailbox = options.inMailbox
@@ -398,15 +400,15 @@ export const EmailSubmissionMethods = {
       sentMailboxId: string
       email: {
         mailboxIds: Record<string, boolean>
-        from: { name?: string; email: string }[]
-        to: { name?: string; email: string }[]
-        cc?: { name?: string; email: string }[]
-        bcc?: { name?: string; email: string }[]
+        from: Array<{ name?: string; email: string }>
+        to: Array<{ name?: string; email: string }>
+        cc?: Array<{ name?: string; email: string }>
+        bcc?: Array<{ name?: string; email: string }>
         subject: string
-        textBody?: { value: string; type: string }[]
-        htmlBody?: { value: string; type: string }[]
-        inReplyTo?: string[]
-        references?: string[]
+        textBody?: Array<{ value: string; type: string }>
+        htmlBody?: Array<{ value: string; type: string }>
+        inReplyTo?: Array<string>
+        references?: Array<string>
       }
     },
   ): Promise<{
@@ -513,7 +515,7 @@ export const IdentityMethods = {
   async get(
     client: JMAPClient,
     accountId: string,
-    ids: string[],
+    ids: Array<string>,
   ): Promise<GetResult<Identity>> {
     return client.call<GetResult<Identity>>(
       'Identity/get',
@@ -559,7 +561,7 @@ export function createEmailHelper(client: JMAPClient, accountId: string) {
       EmailMethods.removeKeyword(client, accountId, emailId, '$flagged'),
     moveToMailbox: (emailId: string, mailboxId: string) =>
       EmailMethods.move(client, accountId, emailId, mailboxId),
-    deleteEmails: (emailIds: string[]) =>
+    deleteEmails: (emailIds: Array<string>) =>
       EmailMethods.destroy(client, accountId, emailIds),
 
     // Identity operations

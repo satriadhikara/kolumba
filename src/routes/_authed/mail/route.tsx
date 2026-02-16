@@ -1,24 +1,19 @@
-import { useState, useEffect } from 'react'
-import {
-  createFileRoute,
-  Outlet,
-  Link,
-  useRouterState,
-} from '@tanstack/react-router'
+import { useEffect, useState } from 'react'
+import { Link, Outlet, createFileRoute } from '@tanstack/react-router'
 import { HugeiconsIcon } from '@hugeicons/react'
 import {
+  LogoutIcon,
+  MoonIcon,
   PlusSignIcon,
   Search01Icon,
-  LogoutIcon,
   SunIcon,
-  MoonIcon,
 } from '@hugeicons/core-free-icons'
+import type { EmailListItem } from '@/lib/jmap/types'
 import { getMailboxesFn } from '@/server/jmap'
 import { logoutFn } from '@/server/auth'
 import { MailboxList } from '@/components/mail/mailbox-list'
 import { Search } from '@/components/mail/search'
 import { Button } from '@/components/ui/button'
-import type { EmailListItem } from '@/lib/jmap/types'
 
 export const Route = createFileRoute('/_authed/mail')({
   loader: async () => {
@@ -32,17 +27,13 @@ function MailLayout() {
   const { mailboxes } = Route.useLoaderData()
   const { session } = Route.useRouteContext()
   const [showSearch, setShowSearch] = useState(false)
-  const [, setSearchResults] = useState<EmailListItem[] | null>(null)
+  const [, setSearchResults] = useState<Array<EmailListItem> | null>(null)
   const [isDark, setIsDark] = useState(() => {
     if (typeof window === 'undefined') return false
     const stored = localStorage.getItem('theme')
     if (stored) return stored === 'dark'
     return window.matchMedia('(prefers-color-scheme: dark)').matches
   })
-  const pathname = useRouterState({
-    select: (state) => state.location.pathname,
-  })
-  const isComposeRoute = pathname === '/mail/compose'
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', isDark)
@@ -58,7 +49,7 @@ function MailLayout() {
     localStorage.setItem('theme', newIsDark ? 'dark' : 'light')
   }
 
-  const handleSearchResults = (emails: EmailListItem[] | null) => {
+  const handleSearchResults = (emails: Array<EmailListItem> | null) => {
     setSearchResults(emails)
   }
 
@@ -127,7 +118,7 @@ function MailLayout() {
             </Link>
           </div>
 
-          {!isComposeRoute && <MailboxList mailboxes={mailboxes} />}
+          <MailboxList mailboxes={mailboxes} />
         </aside>
 
         {/* Content area */}

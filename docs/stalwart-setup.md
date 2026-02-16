@@ -37,12 +37,12 @@ services:
     container_name: stalwart-mail
     restart: unless-stopped
     ports:
-      - "25:25"      # SMTP
-      - "465:465"    # SMTP over TLS
-      - "587:587"    # SMTP Submission
-      - "993:993"    # IMAP over TLS
-      - "443:443"    # HTTPS (JMAP + Web UI)
-      - "8080:8080"  # HTTP (management)
+      - '25:25' # SMTP
+      - '465:465' # SMTP over TLS
+      - '587:587' # SMTP Submission
+      - '993:993' # IMAP over TLS
+      - '443:443' # HTTPS (JMAP + Web UI)
+      - '8080:8080' # HTTP (management)
     volumes:
       - ./stalwart-data:/opt/stalwart-mail
     environment:
@@ -64,6 +64,7 @@ docker logs stalwart-mail 2>&1 | grep -i "admin"
 ```
 
 You'll see output like:
+
 ```
 Created default administrator account "admin" with password "XXXXXXXX"
 ```
@@ -183,9 +184,11 @@ Stalwart includes a built-in web administration interface.
 ### User Settings UI
 
 Users can access their own settings at:
+
 - `https://mail.example.com/settings`
 
 Here they can:
+
 - Change password
 - Set up email forwarding
 - Configure vacation auto-reply
@@ -213,6 +216,7 @@ bun run dev
 ### 3. Verify Connection
 
 If successful, you'll be redirected to your inbox. If you see errors:
+
 - Check that Stalwart is running
 - Verify the URL is correct (no trailing slash)
 - Ensure your credentials are correct
@@ -272,13 +276,13 @@ directory = "https://acme-v02.api.letsencrypt.org/directory"
 
 Open these ports:
 
-| Port | Protocol | Purpose |
-|------|----------|---------|
-| 25 | TCP | SMTP (receiving mail) |
-| 465 | TCP | SMTPS (sending with TLS) |
-| 587 | TCP | Submission (sending) |
-| 993 | TCP | IMAPS (optional, for other clients) |
-| 443 | TCP | HTTPS (JMAP, Web UI) |
+| Port | Protocol | Purpose                             |
+| ---- | -------- | ----------------------------------- |
+| 25   | TCP      | SMTP (receiving mail)               |
+| 465  | TCP      | SMTPS (sending with TLS)            |
+| 587  | TCP      | Submission (sending)                |
+| 993  | TCP      | IMAPS (optional, for other clients) |
+| 443  | TCP      | HTTPS (JMAP, Web UI)                |
 
 ### Reverse Proxy (Optional)
 
@@ -312,11 +316,13 @@ server {
 ### "Connection Refused" in Kolumba
 
 1. Check Stalwart is running:
+
    ```bash
    docker ps | grep stalwart
    ```
 
 2. Test JMAP endpoint:
+
    ```bash
    curl -v https://mail.example.com/.well-known/jmap
    ```
@@ -329,6 +335,7 @@ server {
 ### "Invalid Credentials"
 
 1. Verify the account exists:
+
    ```bash
    docker exec stalwart-mail stalwart-cli account list
    ```
@@ -356,11 +363,13 @@ For development with self-signed certs:
 ### Emails Not Being Received
 
 1. Check MX records:
+
    ```bash
    dig MX example.com
    ```
 
 2. Test SMTP port is open:
+
    ```bash
    nc -zv mail.example.com 25
    ```

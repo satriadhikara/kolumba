@@ -26,7 +26,7 @@ const SESSION_SECRET = process.env.SESSION_SECRET
 
 if (!SESSION_SECRET || SESSION_SECRET.length < 32) {
   console.warn(
-    'Warning: SESSION_SECRET should be at least 32 characters for security'
+    'Warning: SESSION_SECRET should be at least 32 characters for security',
   )
 }
 
@@ -50,7 +50,9 @@ export function useAppSession() {
 /**
  * Check if session has valid authentication data
  */
-export function isSessionValid(data: Partial<SessionData>): data is SessionData {
+export function isSessionValid(
+  data: Partial<SessionData>,
+): data is SessionData {
   return !!(
     data.jmapUrl &&
     data.jmapApiUrl &&

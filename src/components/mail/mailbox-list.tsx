@@ -1,20 +1,20 @@
 import { Link, useRouterState } from '@tanstack/react-router'
 import { HugeiconsIcon } from '@hugeicons/react'
 import {
+  Archive02Icon,
+  Cancel01Icon,
+  Delete02Icon,
+  Edit01Icon,
+  FolderIcon,
   InboxIcon,
   MailSend01Icon,
-  Edit01Icon,
-  Delete02Icon,
-  Cancel01Icon,
-  Archive02Icon,
   StarIcon,
-  FolderIcon,
 } from '@hugeicons/core-free-icons'
-import { cn } from '@/lib/utils'
 import type { Mailbox } from '@/lib/jmap/types'
+import { cn } from '@/lib/utils'
 
 interface MailboxListProps {
-  mailboxes: Mailbox[]
+  mailboxes: Array<Mailbox>
 }
 
 const roleIcons: Record<string, typeof InboxIcon> = {
@@ -27,7 +27,7 @@ const roleIcons: Record<string, typeof InboxIcon> = {
   flagged: StarIcon,
 }
 
-const roleOrder: string[] = [
+const roleOrder: Array<string> = [
   'inbox',
   'drafts',
   'sent',
@@ -40,7 +40,7 @@ export function MailboxList({ mailboxes }: MailboxListProps) {
   const currentMailboxId = useRouterState({
     select: (state) => {
       const mailboxMatch = state.matches.find(
-        (match) => match.routeId === '/_authed/mail/$mailboxId'
+        (match) => match.routeId === '/_authed/mail/$mailboxId',
       )
       return typeof mailboxMatch?.params?.mailboxId === 'string'
         ? mailboxMatch.params.mailboxId
@@ -67,8 +67,7 @@ export function MailboxList({ mailboxes }: MailboxListProps) {
         {sortedMailboxes.map((mailbox) => {
           const Icon = mailbox.role ? roleIcons[mailbox.role] : FolderIcon
           // Use role as the route param for standard folders, ID for custom
-          const mailboxParam =
-            mailbox.role === 'inbox' ? 'inbox' : mailbox.id
+          const mailboxParam = mailbox.role === 'inbox' ? 'inbox' : mailbox.id
           const isActive =
             currentMailboxId === mailboxParam ||
             (currentMailboxId === 'inbox' && mailbox.role === 'inbox') ||
@@ -82,7 +81,7 @@ export function MailboxList({ mailboxes }: MailboxListProps) {
                 className={cn(
                   'flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors',
                   'hover:bg-accent/50',
-                  isActive && 'bg-accent text-accent-foreground font-medium'
+                  isActive && 'bg-accent text-accent-foreground font-medium',
                 )}
               >
                 <HugeiconsIcon
@@ -96,7 +95,7 @@ export function MailboxList({ mailboxes }: MailboxListProps) {
                       'text-xs tabular-nums',
                       isActive
                         ? 'text-accent-foreground'
-                        : 'text-muted-foreground'
+                        : 'text-muted-foreground',
                     )}
                   >
                     {mailbox.unreadEmails}

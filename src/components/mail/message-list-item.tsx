@@ -1,22 +1,22 @@
-import { Link, useParams, useRouterState } from '@tanstack/react-router'
+import { Link, useParams, useRouter, useRouterState  } from '@tanstack/react-router'
 import { HugeiconsIcon } from '@hugeicons/react'
 import {
-  StarIcon,
-  Delete02Icon,
   Archive02Icon,
-  MailOpen01Icon,
+  Delete02Icon,
   MailIcon,
+  MailOpen01Icon,
+  StarIcon,
 } from '@hugeicons/core-free-icons'
+import type {EmailListItem} from '@/lib/jmap/types';
 import { cn } from '@/lib/utils'
-import { JMAPKeywords, type EmailListItem } from '@/lib/jmap/types'
+import {  JMAPKeywords } from '@/lib/jmap/types'
 import {
+  archiveEmailFn,
+  deleteEmailFn,
   markAsReadFn,
   markAsUnreadFn,
   toggleStarFn,
-  deleteEmailFn,
-  archiveEmailFn,
 } from '@/server/jmap'
-import { useRouter } from '@tanstack/react-router'
 
 interface MessageListItemProps {
   email: EmailListItem
@@ -72,7 +72,7 @@ export function MessageListItem({ email }: MessageListItemProps) {
       const msgMatch = state.matches.find(
         (m) => m.routeId === '/_authed/mail/$mailboxId/$messageId',
       )
-      return msgMatch?.params?.messageId as string | undefined
+      return msgMatch?.params?.messageId
     },
   })
   const isRead = email.keywords[JMAPKeywords.SEEN]

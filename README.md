@@ -24,7 +24,7 @@ Kolumba is a purpose-built webmail client for Stalwart Mail Server. Unlike gener
 
 ## Screenshots
 
-*Coming soon*
+_Coming soon_
 
 ## Quick Start
 
@@ -79,7 +79,7 @@ services:
   kolumba:
     build: .
     ports:
-      - "3000:3000"
+      - '3000:3000'
     environment:
       - SESSION_SECRET=your-32-character-secret-here
     restart: unless-stopped
@@ -123,18 +123,18 @@ src/
 
 ## Keyboard Shortcuts
 
-| Key | Action |
-|-----|--------|
+| Key       | Action            |
+| --------- | ----------------- |
 | `j` / `k` | Navigate messages |
-| `c` | Compose new email |
-| `r` | Reply |
-| `a` | Reply all |
-| `f` | Forward |
-| `e` | Archive |
-| `#` | Delete |
-| `s` | Star/unstar |
-| `u` | Mark unread |
-| `Esc` | Close/back |
+| `c`       | Compose new email |
+| `r`       | Reply             |
+| `a`       | Reply all         |
+| `f`       | Forward           |
+| `e`       | Archive           |
+| `#`       | Delete            |
+| `s`       | Star/unstar       |
+| `u`       | Mark unread       |
+| `Esc`     | Close/back        |
 
 ## Development
 
@@ -158,6 +158,7 @@ bun run build
 ## Roadmap
 
 ### v1.0 (Current)
+
 - [x] Login / authentication
 - [x] Mailbox navigation
 - [x] Message list with pagination
@@ -171,6 +172,7 @@ bun run build
 - [x] Responsive design
 
 ### Future
+
 - [ ] Email threading / conversation view
 - [ ] Contacts / address book (JMAP Contacts)
 - [ ] Calendar (JMAP Calendars)

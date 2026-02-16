@@ -1,8 +1,8 @@
-import type { EmailListItem } from '@/lib/jmap/types'
 import { MessageListItem } from './message-list-item'
+import type { EmailListItem } from '@/lib/jmap/types'
 
 interface MessageListProps {
-  emails: EmailListItem[]
+  emails: Array<EmailListItem>
 }
 
 export function MessageList({ emails }: MessageListProps) {

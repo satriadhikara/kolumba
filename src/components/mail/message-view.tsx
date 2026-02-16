@@ -1,19 +1,20 @@
-import { useParams, useRouter, Link } from '@tanstack/react-router'
+import { Link, useParams, useRouter } from '@tanstack/react-router'
 import { HugeiconsIcon } from '@hugeicons/react'
 import {
+  Archive02Icon,
+  ArrowLeft01Icon,
   ArrowTurnBackwardIcon,
   ArrowTurnForwardIcon,
-  Delete02Icon,
-  Archive02Icon,
-  StarIcon,
   AttachmentIcon,
-  ArrowLeft01Icon,
+  Delete02Icon,
+  StarIcon,
 } from '@hugeicons/core-free-icons'
+import { useEffect, useState } from 'react'
+import type {Email} from '@/lib/jmap/types';
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
-import { JMAPKeywords, type Email } from '@/lib/jmap/types'
-import { toggleStarFn, deleteEmailFn, archiveEmailFn } from '@/server/jmap'
-import { useEffect, useState } from 'react'
+import {  JMAPKeywords } from '@/lib/jmap/types'
+import { archiveEmailFn, deleteEmailFn, toggleStarFn } from '@/server/jmap'
 
 interface MessageViewProps {
   email: Email
@@ -39,7 +40,7 @@ function formatAddress(addr: { name: string | null; email: string }): string {
 }
 
 function formatAddresses(
-  addrs: { name: string | null; email: string }[] | null,
+  addrs: Array<{ name: string | null; email: string }> | null,
 ): string {
   if (!addrs || addrs.length === 0) return ''
   return addrs.map(formatAddress).join(', ')

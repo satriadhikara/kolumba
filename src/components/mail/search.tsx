@@ -1,12 +1,16 @@
-import { useState, useCallback } from 'react'
+import { useCallback, useState } from 'react'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { Search01Icon, Cancel01Icon, Loading01Icon } from '@hugeicons/core-free-icons'
+import {
+  Cancel01Icon,
+  Loading01Icon,
+  Search01Icon,
+} from '@hugeicons/core-free-icons'
+import type { EmailListItem } from '@/lib/jmap/types'
 import { Input } from '@/components/ui/input'
 import { searchEmailsFn } from '@/server/jmap'
-import type { EmailListItem } from '@/lib/jmap/types'
 
 interface SearchProps {
-  onResults: (emails: EmailListItem[] | null) => void
+  onResults: (emails: Array<EmailListItem> | null) => void
   onClose: () => void
 }
 
@@ -32,7 +36,7 @@ export function Search({ onResults, onClose }: SearchProps) {
         setIsSearching(false)
       }
     },
-    [onResults]
+    [onResults],
   )
 
   const handleSubmit = (e: React.FormEvent) => {

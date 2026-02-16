@@ -1,15 +1,15 @@
-import { useEffect, useCallback } from 'react'
-import { useRouter, useParams } from '@tanstack/react-router'
+import { useCallback, useEffect } from 'react'
+import { useParams, useRouter } from '@tanstack/react-router'
 import {
+  archiveEmailFn,
+  deleteEmailFn,
   markAsReadFn,
   markAsUnreadFn,
   toggleStarFn,
-  deleteEmailFn,
-  archiveEmailFn,
 } from '@/server/jmap'
 
 interface KeyboardShortcutsOptions {
-  emails?: { id: string; keywords: Record<string, boolean> }[]
+  emails?: Array<{ id: string; keywords: Record<string, boolean> }>
   selectedIndex?: number
   onSelectPrevious?: () => void
   onSelectNext?: () => void
@@ -33,7 +33,13 @@ interface KeyboardShortcutsOptions {
  */
 export function useKeyboardShortcuts(options: KeyboardShortcutsOptions = {}) {
   const router = useRouter()
-  const { emails = [], selectedIndex = -1, onSelectPrevious, onSelectNext, onSelect } = options
+  const {
+    emails = [],
+    selectedIndex = -1,
+    onSelectPrevious,
+    onSelectNext,
+    onSelect,
+  } = options
 
   const handleKeyDown = useCallback(
     async (event: KeyboardEvent) => {
@@ -181,7 +187,7 @@ export function useKeyboardShortcuts(options: KeyboardShortcutsOptions = {}) {
           break
       }
     },
-    [router, emails, selectedIndex, onSelectPrevious, onSelectNext, onSelect]
+    [router, emails, selectedIndex, onSelectPrevious, onSelectNext, onSelect],
   )
 
   useEffect(() => {
