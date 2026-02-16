@@ -3,9 +3,10 @@ import type { EmailListItem } from '@/lib/jmap/types'
 
 interface MessageListProps {
   emails: Array<EmailListItem>
+  isTrash?: boolean
 }
 
-export function MessageList({ emails }: MessageListProps) {
+export function MessageList({ emails, isTrash }: MessageListProps) {
   if (emails.length === 0) {
     return (
       <div className="flex-1 flex items-center justify-center text-muted-foreground">
@@ -17,7 +18,7 @@ export function MessageList({ emails }: MessageListProps) {
   return (
     <div className="flex-1 overflow-y-auto">
       {emails.map((email) => (
-        <MessageListItem key={email.id} email={email} />
+        <MessageListItem key={email.id} email={email} isTrash={isTrash} />
       ))}
     </div>
   )

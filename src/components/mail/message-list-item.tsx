@@ -22,9 +22,11 @@ import {
   markAsUnreadFn,
   toggleStarFn,
 } from '@/server/jmap'
+import { useConfirmDialog } from '@/components/ui/confirm-dialog'
 
 interface MessageListItemProps {
   email: EmailListItem
+  isTrash?: boolean
 }
 
 function formatDate(dateString: string): string {
@@ -69,7 +71,7 @@ function getInitials(from: EmailListItem['from']): string {
   return name.slice(0, 2).toUpperCase()
 }
 
-export function MessageListItem({ email }: MessageListItemProps) {
+export function MessageListItem({ email, isTrash }: MessageListItemProps) {
   const router = useRouter()
   const params = useParams({ from: '/_authed/mail/$mailboxId' })
   const currentMessageId = useRouterState({
@@ -83,6 +85,8 @@ export function MessageListItem({ email }: MessageListItemProps) {
   const isRead = email.keywords[JMAPKeywords.SEEN]
   const isStarred = email.keywords[JMAPKeywords.FLAGGED]
   const isSelected = currentMessageId === email.id
+
+  const { confirm, ConfirmDialogComponent } = useConfirmDialog()
 
   const handleToggleStar = async (e: React.MouseEvent) => {
     e.preventDefault()
@@ -112,103 +116,147 @@ export function MessageListItem({ email }: MessageListItemProps) {
   const handleDelete = async (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
-    await deleteEmailFn({ data: { emailId: email.id } })
-    router.invalidate()
+
+    const isCurrentEmail = currentMessageId === email.id
+
+    if (isTrash) {
+      confirm({
+        title: 'Delete permanently?',
+        description:
+          'This email will be permanently deleted and cannot be recovered.',
+        confirmText: 'Delete',
+        cancelText: 'Cancel',
+        variant: 'destructive',
+        onConfirm: async () => {
+          await deleteEmailFn({
+            data: { emailId: email.id, permanent: true },
+          })
+          if (isCurrentEmail) {
+            router.navigate({
+              to: '/mail/$mailboxId',
+              params: { mailboxId: params.mailboxId },
+            })
+          } else {
+            router.invalidate()
+          }
+        },
+      })
+    } else {
+      await deleteEmailFn({ data: { emailId: email.id } })
+      if (isCurrentEmail) {
+        router.navigate({
+          to: '/mail/$mailboxId',
+          params: { mailboxId: params.mailboxId },
+        })
+      } else {
+        router.invalidate()
+      }
+    }
   }
 
   return (
-    <Link
-      to="/mail/$mailboxId/$messageId"
-      params={{ mailboxId: params.mailboxId, messageId: email.id }}
-      className={cn(
-        'group relative flex gap-3 px-4 py-3 border-b transition-colors',
-        'hover:bg-muted/50',
-        isSelected && 'border-l-2 border-l-accent bg-muted/30',
-        !isRead && 'bg-accent/5',
-      )}
-    >
-      {/* Avatar */}
-      <div
+    <>
+      <Link
+        to="/mail/$mailboxId/$messageId"
+        params={{ mailboxId: params.mailboxId, messageId: email.id }}
         className={cn(
-          'h-10 w-10 rounded-full flex items-center justify-center shrink-0 text-sm font-medium',
-          isRead
-            ? 'bg-muted text-muted-foreground'
-            : 'bg-primary text-primary-foreground',
+          'group relative flex gap-3 px-4 py-3 border-b transition-colors',
+          'hover:bg-muted/50',
+          isSelected && 'border-l-2 border-l-accent bg-muted/30',
+          !isRead && 'bg-accent/5',
         )}
       >
-        {getInitials(email.from)}
-      </div>
-
-      {/* Content */}
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2">
-          <span className={cn('truncate', !isRead && 'font-semibold')}>
-            {getSenderDisplay(email.from)}
-          </span>
-          <span className="ml-auto text-xs text-muted-foreground shrink-0">
-            {formatDate(email.receivedAt)}
-          </span>
-        </div>
-
+        {/* Avatar */}
         <div
           className={cn(
-            'truncate text-sm',
-            !isRead ? 'text-foreground font-medium' : 'text-foreground',
+            'h-10 w-10 rounded-full flex items-center justify-center shrink-0 text-sm font-medium',
+            isRead
+              ? 'bg-muted text-muted-foreground'
+              : 'bg-primary text-primary-foreground',
           )}
         >
-          {email.subject || '(No subject)'}
+          {getInitials(email.from)}
         </div>
 
-        <div className="relative flex items-center">
-          <div className="truncate text-sm text-muted-foreground flex-1 group-hover:[mask-image:linear-gradient(to_right,black_0%,black_60%,transparent_100%)]">
-            {email.preview}
+        {/* Content */}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2">
+            <span className={cn('truncate', !isRead && 'font-semibold')}>
+              {getSenderDisplay(email.from)}
+            </span>
+            <span className="ml-auto text-xs text-muted-foreground shrink-0">
+              {formatDate(email.receivedAt)}
+            </span>
           </div>
 
-          {/* Actions overlay on hover */}
-          <div className="hidden group-hover:flex items-center gap-0.5 absolute right-0 top-0 bottom-0 pl-8 bg-gradient-to-r from-transparent via-background/80 to-background">
-            <button
-              onClick={handleToggleStar}
-              className={cn(
-                'p-1.5 rounded-md transition-colors hover:bg-accent',
-                isStarred && 'text-yellow-500',
+          <div
+            className={cn(
+              'truncate text-sm',
+              !isRead ? 'text-foreground font-medium' : 'text-foreground',
+            )}
+          >
+            {email.subject || '(No subject)'}
+          </div>
+
+          <div className="relative flex items-center">
+            <div className="truncate text-sm text-muted-foreground flex-1 group-hover:[mask-image:linear-gradient(to_right,black_0%,black_60%,transparent_100%)]">
+              {email.preview}
+            </div>
+
+            {/* Actions overlay on hover */}
+            <div className="hidden group-hover:flex items-center gap-0.5 absolute right-0 top-0 bottom-0 pl-8 bg-gradient-to-r from-transparent via-background/80 to-background">
+              {!isTrash && (
+                <button
+                  onClick={handleToggleStar}
+                  className={cn(
+                    'p-1.5 rounded-md transition-colors hover:bg-accent',
+                    isStarred && 'text-yellow-500',
+                  )}
+                  title={isStarred ? 'Unstar' : 'Star'}
+                >
+                  <HugeiconsIcon
+                    icon={StarIcon}
+                    className={cn('h-4 w-4', isStarred && 'fill-current')}
+                  />
+                </button>
               )}
-              title={isStarred ? 'Unstar' : 'Star'}
-            >
-              <HugeiconsIcon
-                icon={StarIcon}
-                className={cn('h-4 w-4', isStarred && 'fill-current')}
-              />
-            </button>
 
-            <button
-              onClick={handleToggleRead}
-              className="p-1.5 rounded-md hover:bg-accent transition-colors"
-              title={isRead ? 'Mark as unread' : 'Mark as read'}
-            >
-              <HugeiconsIcon
-                icon={isRead ? MailIcon : MailOpen01Icon}
-                className="h-4 w-4"
-              />
-            </button>
+              <button
+                onClick={handleToggleRead}
+                className="p-1.5 rounded-md hover:bg-accent transition-colors"
+                title={isRead ? 'Mark as unread' : 'Mark as read'}
+              >
+                <HugeiconsIcon
+                  icon={isRead ? MailIcon : MailOpen01Icon}
+                  className="h-4 w-4"
+                />
+              </button>
 
-            <button
-              onClick={handleArchive}
-              className="p-1.5 rounded-md hover:bg-accent transition-colors"
-              title="Archive"
-            >
-              <HugeiconsIcon icon={Archive02Icon} className="h-4 w-4" />
-            </button>
+              {!isTrash && (
+                <button
+                  onClick={handleArchive}
+                  className="p-1.5 rounded-md hover:bg-accent transition-colors"
+                  title="Archive"
+                >
+                  <HugeiconsIcon icon={Archive02Icon} className="h-4 w-4" />
+                </button>
+              )}
 
-            <button
-              onClick={handleDelete}
-              className="p-1.5 rounded-md hover:bg-accent hover:text-destructive transition-colors"
-              title="Delete"
-            >
-              <HugeiconsIcon icon={Delete02Icon} className="h-4 w-4" />
-            </button>
+              <button
+                onClick={handleDelete}
+                className={cn(
+                  'p-1.5 rounded-md hover:bg-accent transition-colors',
+                  isTrash && 'hover:text-destructive',
+                )}
+                title={isTrash ? 'Delete permanently' : 'Delete'}
+              >
+                <HugeiconsIcon icon={Delete02Icon} className="h-4 w-4" />
+              </button>
+            </div>
           </div>
         </div>
-      </div>
-    </Link>
+      </Link>
+      <ConfirmDialogComponent />
+    </>
   )
 }

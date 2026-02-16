@@ -15,9 +15,11 @@ import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { JMAPKeywords } from '@/lib/jmap/types'
 import { archiveEmailFn, deleteEmailFn, toggleStarFn } from '@/server/jmap'
+import { useConfirmDialog } from '@/components/ui/confirm-dialog'
 
 interface MessageViewProps {
   email: Email
+  isTrash?: boolean
 }
 
 function formatFullDate(dateString: string): string {
@@ -85,11 +87,13 @@ function getEmailBody(email: Email): {
   return { html, text }
 }
 
-export function MessageView({ email }: MessageViewProps) {
+export function MessageView({ email, isTrash }: MessageViewProps) {
   const router = useRouter()
   const params = useParams({ from: '/_authed/mail/$mailboxId/$messageId' })
   const isStarred = email.keywords[JMAPKeywords.FLAGGED]
   const { html, text } = getEmailBody(email)
+
+  const { confirm, ConfirmDialogComponent } = useConfirmDialog()
 
   // Track theme state - initialize from localStorage, fallback to system preference
   const [isDarkMode, setIsDarkMode] = useState(() => {
@@ -178,11 +182,31 @@ export function MessageView({ email }: MessageViewProps) {
   }
 
   const handleDelete = async () => {
-    await deleteEmailFn({ data: { emailId: email.id } })
-    router.navigate({
-      to: '/mail/$mailboxId',
-      params: { mailboxId: params.mailboxId },
-    })
+    if (isTrash) {
+      confirm({
+        title: 'Delete permanently?',
+        description:
+          'This email will be permanently deleted and cannot be recovered.',
+        confirmText: 'Delete',
+        cancelText: 'Cancel',
+        variant: 'destructive',
+        onConfirm: async () => {
+          await deleteEmailFn({
+            data: { emailId: email.id, permanent: true },
+          })
+          router.navigate({
+            to: '/mail/$mailboxId',
+            params: { mailboxId: params.mailboxId },
+          })
+        },
+      })
+    } else {
+      await deleteEmailFn({ data: { emailId: email.id } })
+      router.navigate({
+        to: '/mail/$mailboxId',
+        params: { mailboxId: params.mailboxId },
+      })
+    }
   }
 
   const handleReply = () => {
@@ -218,50 +242,61 @@ export function MessageView({ email }: MessageViewProps) {
           <HugeiconsIcon icon={ArrowLeft01Icon} className="h-4 w-4" />
         </Link>
 
-        <Button variant="ghost" size="sm" onClick={handleReply}>
-          <HugeiconsIcon
-            icon={ArrowTurnBackwardIcon}
-            className="h-4 w-4 mr-1"
-          />
-          Reply
-        </Button>
+        {!isTrash && (
+          <>
+            <Button variant="ghost" size="sm" onClick={handleReply}>
+              <HugeiconsIcon
+                icon={ArrowTurnBackwardIcon}
+                className="h-4 w-4 mr-1"
+              />
+              Reply
+            </Button>
 
-        <Button variant="ghost" size="sm" onClick={handleReplyAll}>
-          <HugeiconsIcon
-            icon={ArrowTurnBackwardIcon}
-            className="h-4 w-4 mr-1"
-          />
-          Reply All
-        </Button>
+            <Button variant="ghost" size="sm" onClick={handleReplyAll}>
+              <HugeiconsIcon
+                icon={ArrowTurnBackwardIcon}
+                className="h-4 w-4 mr-1"
+              />
+              Reply All
+            </Button>
 
-        <Button variant="ghost" size="sm" onClick={handleForward}>
-          <HugeiconsIcon icon={ArrowTurnForwardIcon} className="h-4 w-4 mr-1" />
-          Forward
-        </Button>
+            <Button variant="ghost" size="sm" onClick={handleForward}>
+              <HugeiconsIcon
+                icon={ArrowTurnForwardIcon}
+                className="h-4 w-4 mr-1"
+              />
+              Forward
+            </Button>
+          </>
+        )}
 
         <div className="flex-1" />
 
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={handleToggleStar}
-          className={cn(isStarred && 'text-yellow-500')}
-        >
-          <HugeiconsIcon
-            icon={StarIcon}
-            className={cn('h-4 w-4', isStarred && 'fill-current')}
-          />
-        </Button>
+        {!isTrash && (
+          <>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleToggleStar}
+              className={cn(isStarred && 'text-yellow-500')}
+            >
+              <HugeiconsIcon
+                icon={StarIcon}
+                className={cn('h-4 w-4', isStarred && 'fill-current')}
+              />
+            </Button>
 
-        <Button variant="ghost" size="icon" onClick={handleArchive}>
-          <HugeiconsIcon icon={Archive02Icon} className="h-4 w-4" />
-        </Button>
+            <Button variant="ghost" size="icon" onClick={handleArchive}>
+              <HugeiconsIcon icon={Archive02Icon} className="h-4 w-4" />
+            </Button>
+          </>
+        )}
 
         <Button
           variant="ghost"
           size="icon"
           onClick={handleDelete}
-          className="hover:text-destructive"
+          className={cn(isTrash && 'hover:text-destructive')}
         >
           <HugeiconsIcon icon={Delete02Icon} className="h-4 w-4" />
         </Button>
@@ -364,6 +399,7 @@ export function MessageView({ email }: MessageViewProps) {
           </div>
         </div>
       </div>
+      <ConfirmDialogComponent />
     </div>
   )
 }

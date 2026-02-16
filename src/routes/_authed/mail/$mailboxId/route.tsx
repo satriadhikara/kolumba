@@ -40,6 +40,7 @@ export const Route = createFileRoute('/_authed/mail/$mailboxId')({
 
 function MailboxRoute() {
   const { mailbox, emails, total } = Route.useLoaderData()
+  const isTrash = mailbox?.role === 'trash'
 
   return (
     <div className="flex flex-1 min-w-0">
@@ -49,7 +50,7 @@ function MailboxRoute() {
           <h2 className="font-medium truncate">{mailbox?.name || 'Mailbox'}</h2>
           <span className="ml-2 text-sm text-muted-foreground">{total}</span>
         </div>
-        <MessageList emails={emails} />
+        <MessageList emails={emails} isTrash={isTrash} />
       </div>
 
       {/* Message detail (or empty state) */}
