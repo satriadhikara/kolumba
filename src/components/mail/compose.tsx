@@ -181,7 +181,7 @@ export function Compose({
       {/* Form */}
       <form
         onSubmit={handleSubmit}
-        className="flex-1 flex flex-col p-4 gap-4 overflow-y-auto"
+        className="flex-1 flex flex-col p-4 gap-4 min-h-0"
       >
         {/* From (if multiple identities) */}
         {identities.length > 1 && (
@@ -268,7 +268,7 @@ export function Compose({
         </div>
 
         {/* Body - Rich Text Editor */}
-        <div className="flex-1 flex flex-col min-h-[250px]">
+        <div className="flex-1 flex flex-col min-h-0">
           <Label className="sr-only">Message</Label>
           <RichTextEditor
             value={body}
@@ -285,7 +285,7 @@ export function Compose({
         )}
 
         {/* Actions */}
-        <div className="flex gap-2">
+        <div className="shrink-0 flex gap-2">
           <Button type="submit" disabled={isLoading}>
             <HugeiconsIcon icon={MailSend01Icon} className="h-4 w-4 mr-2" />
             {isLoading ? 'Sending...' : 'Send'}

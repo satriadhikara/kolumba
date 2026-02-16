@@ -153,7 +153,7 @@ export function RichTextEditor({
   }
 
   return (
-    <div className="flex flex-col border rounded-md bg-background">
+    <div className="flex-1 flex flex-col min-h-0 border rounded-md bg-background">
       {/* Toolbar */}
       <div className="flex items-center gap-0.5 p-1 border-b bg-muted/30">
         {/* Text Formatting */}
