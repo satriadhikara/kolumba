@@ -94,7 +94,7 @@ export const deleteMailboxFn = createServerFn({ method: 'POST' })
 
     if (result.notDestroyed?.[data.mailboxId]) {
       throw new Error(
-        result.notDestroyed[data.mailboxId].description ||
+        result.notDestroyed[data.mailboxId]?.description ||
           'Failed to delete mailbox',
       )
     }

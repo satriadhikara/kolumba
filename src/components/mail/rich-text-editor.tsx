@@ -1,4 +1,4 @@
-import { useEditor, EditorContent } from '@tiptap/react'
+import { EditorContent, useEditor } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import Link from '@tiptap/extension-link'
 import Placeholder from '@tiptap/extension-placeholder'
@@ -6,14 +6,14 @@ import Typography from '@tiptap/extension-typography'
 import { useEffect, useState } from 'react'
 import { HugeiconsIcon } from '@hugeicons/react'
 import {
-  TextBoldIcon,
-  TextItalicIcon,
-  TextUnderlineIcon,
-  TextStrikethroughIcon,
-  LinkSquare01Icon,
   BulletIcon,
+  LinkSquare01Icon,
   QuoteDownIcon,
   TextAlignLeft01Icon,
+  TextBoldIcon,
+  TextItalicIcon,
+  TextStrikethroughIcon,
+  TextUnderlineIcon,
 } from '@hugeicons/core-free-icons'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -115,8 +115,8 @@ export function RichTextEditor({
     ],
     content: value,
     immediatelyRender: false,
-    onUpdate: ({ editor }) => {
-      onChange(editor.getHTML())
+    onUpdate: ({ editor: editorInstance }) => {
+      onChange(editorInstance.getHTML())
     },
   })
 

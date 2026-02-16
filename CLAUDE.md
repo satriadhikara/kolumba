@@ -16,6 +16,8 @@ bun run build        # Production build
 bun run test         # Run tests (Vitest)
 bun run lint         # Run ESLint
 bun run check        # Format with Prettier and fix ESLint issues
+bun run preview      # Preview production build
+bun run format       # Run Prettier (check only)
 ```
 
 ## Tech Stack
@@ -23,6 +25,8 @@ bun run check        # Format with Prettier and fix ESLint issues
 - **Framework:** TanStack Start (React 19 meta-framework with SSR via Nitro)
 - **Routing:** TanStack Router with file-based routing in `src/routes/`
 - **UI:** shadcn/ui (base-nova style, Zinc base, Violet accent, small radius)
+- **Base Components:** @base-ui/react (headless component primitives)
+- **Rich Text Editor:** Tiptap
 - **Font:** Geist
 - **Icons:** HugeIcons
 - **Styling:** Tailwind CSS v4
@@ -35,9 +39,11 @@ bun run check        # Format with Prettier and fix ESLint issues
 ### Key Patterns
 
 - **File-based Routing:** Routes are defined in `src/routes/`. The `__root.tsx` file is the root layout. Route tree is auto-generated in `routeTree.gen.ts` (do not edit manually).
+- **Authenticated Routes:** Protected routes use the `_authed` layout route pattern. Routes under `src/routes/_authed/` require authentication; the `_authed.tsx` layout handles auth checks and redirects.
 - **Path Aliases:** Use `@/*` to import from `src/*` (e.g., `@/components/ui/button`).
 - **Component Variants:** UI components use class-variance-authority (CVA) for variant styling.
 - **Utility Function:** Use `cn()` from `@/lib/utils` for merging Tailwind classes.
+- **TypeScript Strictness:** `noUncheckedIndexedAccess` is enabled — array/record indexed access returns `T | undefined`. Always handle the `undefined` case when accessing `arr[i]` or `record[key]`.
 
 ### Key Principle: Server functions handle all JMAP calls
 
@@ -66,34 +72,45 @@ Auth is per-user via login flow.
 
 ```
 src/
+├── router.tsx                                # TanStack Router configuration
+├── styles.css                                # Global styles (Tailwind)
+├── logo.svg                                  # App logo
+├── routeTree.gen.ts                          # Auto-generated route tree (do not edit)
 ├── routes/
-│   ├── __root.tsx                    # root layout
-│   ├── index.tsx                     # landing/redirect
-│   ├── login.tsx                     # login page
-│   └── mail/
-│       ├── route.tsx                 # mail layout (sidebar + content area)
-│       ├── $mailboxId/
-│       │   ├── route.tsx             # message list for mailbox
-│       │   └── $messageId.tsx        # message detail view
-│       └── compose.tsx               # compose new email
+│   ├── __root.tsx                            # root layout
+│   ├── index.tsx                             # landing/redirect
+│   ├── login.tsx                             # login page
+│   └── _authed.tsx                           # authenticated layout (auth guard)
+│       └── _authed/
+│           └── mail/
+│               ├── route.tsx                 # mail layout (sidebar + content area)
+│               ├── compose.tsx               # compose new email
+│               └── $mailboxId/
+│                   ├── route.tsx             # message list layout for mailbox
+│                   ├── index.tsx             # message list default view
+│                   └── $messageId.tsx        # message detail view
 ├── server/
-│   ├── jmap.ts                       # core JMAP server functions
-│   ├── auth.ts                       # authentication logic
-│   └── session.ts                    # session/cookie management
+│   ├── jmap.ts                               # core JMAP server functions
+│   ├── auth.ts                               # authentication logic
+│   └── session.ts                            # session/cookie management
 ├── lib/
 │   ├── jmap/
-│   │   ├── client.ts                 # JMAP request builder
-│   │   ├── types.ts                  # JMAP type definitions (Email, Mailbox, etc.)
-│   │   └── methods.ts                # typed method helpers (Email/get, Mailbox/query, etc.)
-│   └── utils.ts
+│   │   ├── client.ts                         # JMAP request builder
+│   │   ├── types.ts                          # JMAP type definitions (Email, Mailbox, etc.)
+│   │   └── methods.ts                        # typed method helpers (Email/get, Mailbox/query, etc.)
+│   └── utils.ts                              # cn() utility
+├── hooks/
+│   └── use-keyboard-shortcuts.ts             # keyboard shortcut handler (j/k, r, a, etc.)
 └── components/
     ├── mail/
-    │   ├── mailbox-list.tsx           # sidebar mailbox navigation
-    │   ├── message-list.tsx           # email list with hover actions
-    │   ├── message-list-item.tsx      # individual message row
-    │   ├── message-view.tsx           # email detail/reading pane
-    │   └── compose.tsx                # compose/reply modal
-    └── ui/                            # shadcn components
+    │   ├── mailbox-list.tsx                   # sidebar mailbox navigation
+    │   ├── message-list.tsx                   # email list with hover actions
+    │   ├── message-list-item.tsx              # individual message row
+    │   ├── message-view.tsx                   # email detail/reading pane
+    │   ├── compose.tsx                        # compose/reply form
+    │   ├── rich-text-editor.tsx               # Tiptap rich text editor for compose
+    │   └── search.tsx                         # email search component
+    └── ui/                                    # shadcn/ui components
 ```
 
 ## JMAP Implementation

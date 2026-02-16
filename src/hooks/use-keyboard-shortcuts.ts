@@ -1,5 +1,5 @@
 import { useCallback, useEffect } from 'react'
-import { useParams, useRouter } from '@tanstack/react-router'
+import { useRouter } from '@tanstack/react-router'
 import {
   archiveEmailFn,
   deleteEmailFn,

@@ -6,6 +6,7 @@
 import type {
   JMAPRequest,
   JMAPResponse,
+  JMAPSession,
   MethodCall,
   MethodResponse,
   ResultReference,
@@ -80,7 +81,7 @@ export class JMAPRequestBuilder {
       throw new Error(`Unknown call ID: ${callId}`)
     }
 
-    const methodName = this.methodCalls[index][0]
+    const methodName = this.methodCalls[index]![0]
 
     return {
       resultOf: callId,
@@ -212,7 +213,7 @@ export async function discoverJMAPSession(
   jmapUrl: string,
   accessToken: string,
 ): Promise<{
-  session: import('./types').JMAPSession
+  session: JMAPSession
   apiUrl: string
   accountId: string
 }> {
@@ -238,10 +239,10 @@ export async function discoverJMAPSession(
     )
   }
 
-  const session = (await response.json()) as import('./types').JMAPSession
+  const session = (await response.json()) as JMAPSession
 
   // Get primary mail account
-  const mailAccountId = session.primaryAccounts?.['urn:ietf:params:jmap:mail']
+  const mailAccountId = session.primaryAccounts['urn:ietf:params:jmap:mail']
   if (!mailAccountId) {
     throw new JMAPClientError(
       'noMailAccount',

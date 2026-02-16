@@ -46,7 +46,7 @@ export const Route = createFileRoute('/_authed/mail/compose')({
     return (
       <div className="p-4">
         <h2>Error loading compose</h2>
-        <p>{error?.message || String(error)}</p>
+        <p>{error.message || String(error)}</p>
       </div>
     )
   },

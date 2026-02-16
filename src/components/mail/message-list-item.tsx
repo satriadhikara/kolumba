@@ -58,7 +58,7 @@ function formatDate(dateString: string): string {
 
 function getSenderDisplay(from: EmailListItem['from']): string {
   if (!from || from.length === 0) return 'Unknown'
-  const sender = from[0]
+  const sender = from[0]!
   return sender.name || sender.email
 }
 
@@ -66,7 +66,7 @@ function getInitials(from: EmailListItem['from']): string {
   const name = getSenderDisplay(from)
   const parts = name.split(' ').filter(Boolean)
   if (parts.length >= 2) {
-    return (parts[0][0] + parts[1][0]).toUpperCase()
+    return (parts[0]![0]! + parts[1]![0]!).toUpperCase()
   }
   return name.slice(0, 2).toUpperCase()
 }
@@ -79,7 +79,7 @@ export function MessageListItem({ email, isTrash }: MessageListItemProps) {
       const msgMatch = state.matches.find(
         (m) => m.routeId === '/_authed/mail/$mailboxId/$messageId',
       )
-      return msgMatch?.params?.messageId
+      return msgMatch ? msgMatch.params.messageId : undefined
     },
   })
   const isRead = email.keywords[JMAPKeywords.SEEN]

@@ -50,11 +50,11 @@ function formatAddresses(
 
 function getInitials(from: Email['from']): string {
   if (!from || from.length === 0) return '??'
-  const sender = from[0]
+  const sender = from[0]!
   const name = sender.name || sender.email
   const parts = name.split(' ').filter(Boolean)
   if (parts.length >= 2) {
-    return (parts[0][0] + parts[1][0]).toUpperCase()
+    return (parts[0]![0]! + parts[1]![0]!).toUpperCase()
   }
   return name.slice(0, 2).toUpperCase()
 }
@@ -69,17 +69,17 @@ function getEmailBody(email: Email): {
   if (email.bodyValues) {
     // Check HTML body parts
     if (email.htmlBody && email.htmlBody.length > 0) {
-      const htmlPart = email.htmlBody[0]
+      const htmlPart = email.htmlBody[0]!
       if (htmlPart.partId && email.bodyValues[htmlPart.partId]) {
-        html = email.bodyValues[htmlPart.partId].value
+        html = email.bodyValues[htmlPart.partId]!.value
       }
     }
 
     // Check text body parts
     if (email.textBody && email.textBody.length > 0) {
-      const textPart = email.textBody[0]
+      const textPart = email.textBody[0]!
       if (textPart.partId && email.bodyValues[textPart.partId]) {
-        text = email.bodyValues[textPart.partId].value
+        text = email.bodyValues[textPart.partId]!.value
       }
     }
   }

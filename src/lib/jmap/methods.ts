@@ -3,13 +3,13 @@
  * Typed helpers for common JMAP method calls
  */
 
-import { JMAPRequestBuilder, createJMAPClient } from './client'
+import { JMAPRequestBuilder } from './client'
 import {
   EMAIL_FULL_PROPERTIES,
   EMAIL_LIST_PROPERTIES,
   JMAPCapabilities,
 } from './types'
-import type { JMAPClient, JMAPHttpOptions } from './client'
+import type { JMAPClient } from './client'
 import type {
   ChangesResult,
   Comparator,
@@ -22,7 +22,6 @@ import type {
   Keywords,
   Mailbox,
   QueryResult,
-  ResultReference,
   SetResult,
 } from './types'
 
@@ -401,8 +400,9 @@ export const EmailSubmissionMethods = {
         cc?: Array<{ name?: string; email: string }>
         bcc?: Array<{ name?: string; email: string }>
         subject: string
-        textBody?: Array<{ value: string; type: string }>
-        htmlBody?: Array<{ value: string; type: string }>
+        bodyValues?: Record<string, { value: string }>
+        textBody?: Array<{ partId?: string; value?: string; type: string }>
+        htmlBody?: Array<{ partId?: string; value?: string; type: string }>
         inReplyTo?: Array<string>
         references?: Array<string>
       }
@@ -566,12 +566,14 @@ export function createEmailHelper(client: JMAPClient, accountId: string) {
     // Send email
     sendEmail: (
       identityId: string,
+      sentMailboxId: string,
       email: Parameters<
         typeof EmailSubmissionMethods.createAndSend
       >[2]['email'],
     ) =>
       EmailSubmissionMethods.createAndSend(client, accountId, {
         identityId,
+        sentMailboxId,
         email,
       }),
   }

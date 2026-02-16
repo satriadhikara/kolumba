@@ -42,9 +42,8 @@ export function MailboxList({ mailboxes }: MailboxListProps) {
       const mailboxMatch = state.matches.find(
         (match) => match.routeId === '/_authed/mail/$mailboxId',
       )
-      return typeof mailboxMatch?.params?.mailboxId === 'string'
-        ? mailboxMatch.params.mailboxId
-        : ''
+      if (!mailboxMatch) return ''
+      return mailboxMatch.params.mailboxId || ''
     },
   })
 
@@ -65,7 +64,9 @@ export function MailboxList({ mailboxes }: MailboxListProps) {
     <nav className="flex-1 overflow-y-auto py-2">
       <ul className="space-y-0.5 px-2">
         {sortedMailboxes.map((mailbox) => {
-          const Icon = mailbox.role ? roleIcons[mailbox.role] : FolderIcon
+          const Icon = mailbox.role
+            ? (roleIcons[mailbox.role] ?? FolderIcon)
+            : FolderIcon
           // Use role as the route param for standard folders, ID for custom
           const mailboxParam = mailbox.role === 'inbox' ? 'inbox' : mailbox.id
           const isActive =
@@ -84,10 +85,7 @@ export function MailboxList({ mailboxes }: MailboxListProps) {
                   isActive && 'bg-accent text-accent-foreground font-medium',
                 )}
               >
-                <HugeiconsIcon
-                  icon={Icon || FolderIcon}
-                  className="h-4 w-4 shrink-0"
-                />
+                <HugeiconsIcon icon={Icon} className="h-4 w-4 shrink-0" />
                 <span className="flex-1 truncate">{mailbox.name}</span>
                 {mailbox.unreadEmails > 0 && (
                   <span
