@@ -46,7 +46,7 @@ function RootComponent() {
   return (
     <>
       <Outlet />
-      <ToasterThemeSync />
+      <Toaster />
     </>
   )
 }
@@ -105,8 +105,4 @@ function NotFound() {
       </a>
     </div>
   )
-}
-
-function ToasterThemeSync() {
-  return <Toaster />
 }

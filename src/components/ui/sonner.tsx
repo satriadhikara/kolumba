@@ -1,4 +1,4 @@
-import { useTheme } from 'next-themes'
+import { useSyncExternalStore } from 'react'
 import { Toaster as Sonner } from 'sonner'
 import { HugeiconsIcon } from '@hugeicons/react'
 import {
@@ -10,12 +10,30 @@ import {
 } from '@hugeicons/core-free-icons'
 import type { ToasterProps } from 'sonner'
 
+function getTheme(): 'light' | 'dark' {
+  if (typeof window === 'undefined') return 'light'
+  return document.documentElement.classList.contains('dark') ? 'dark' : 'light'
+}
+
+function subscribe(callback: () => void) {
+  const observer = new MutationObserver(callback)
+  observer.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ['class'],
+  })
+  return () => observer.disconnect()
+}
+
+function useThemeFromClassList(): 'light' | 'dark' {
+  return useSyncExternalStore(subscribe, getTheme, () => 'light')
+}
+
 const Toaster = ({ ...props }: ToasterProps) => {
-  const { theme = 'system' } = useTheme()
+  const theme = useThemeFromClassList()
 
   return (
     <Sonner
-      theme={theme as ToasterProps['theme']}
+      theme={theme}
       className="toaster group"
       icons={{
         success: (
