@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link, Outlet, createFileRoute } from '@tanstack/react-router'
+import { Link, Outlet, createFileRoute, useNavigate } from '@tanstack/react-router'
 import { HugeiconsIcon } from '@hugeicons/react'
 import {
   LogoutIcon,
@@ -44,9 +44,12 @@ function MailLayout() {
     document.documentElement.classList.toggle('dark', isDark)
   }, [isDark])
 
+  const navigate = useNavigate()
+
   const handleLogout = async () => {
     try {
       await logoutFn()
+      await navigate({ to: '/login' })
     } catch {
       toast.error('Failed to log out')
     }
