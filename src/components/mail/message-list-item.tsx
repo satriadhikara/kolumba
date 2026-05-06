@@ -24,6 +24,7 @@ import {
   toggleStarFn,
 } from '@/server/jmap'
 import { useConfirmDialog } from '@/components/ui/confirm-dialog'
+import { getAvatarGradient, getInitials } from '@/lib/avatar'
 
 interface MessageListItemProps {
   email: EmailListItem
@@ -63,15 +64,6 @@ function getSenderDisplay(from: EmailListItem['from']): string {
   return sender.name || sender.email
 }
 
-function getInitials(from: EmailListItem['from']): string {
-  const name = getSenderDisplay(from)
-  const parts = name.split(' ').filter(Boolean)
-  if (parts.length >= 2) {
-    return (parts[0]![0]! + parts[1]![0]!).toUpperCase()
-  }
-  return name.slice(0, 2).toUpperCase()
-}
-
 export function MessageListItem({ email, isTrash }: MessageListItemProps) {
   const router = useRouter()
   const params = useParams({ from: '/_authed/mail/$mailboxId' })
@@ -86,6 +78,10 @@ export function MessageListItem({ email, isTrash }: MessageListItemProps) {
   const isRead = email.keywords[JMAPKeywords.SEEN]
   const isStarred = email.keywords[JMAPKeywords.FLAGGED]
   const isSelected = currentMessageId === email.id
+
+  const senderName = getSenderDisplay(email.from)
+  const initials = getInitials(senderName)
+  const avatarGradient = getAvatarGradient(senderName)
 
   const { confirm, ConfirmDialogComponent } = useConfirmDialog()
 
@@ -184,30 +180,46 @@ export function MessageListItem({ email, isTrash }: MessageListItemProps) {
         to="/mail/$mailboxId/$messageId"
         params={{ mailboxId: params.mailboxId, messageId: email.id }}
         className={cn(
-          'group relative flex gap-3 px-4 py-3 border-b transition-colors',
-          'hover:bg-muted/50',
-          isSelected && 'border-l-2 border-l-accent bg-muted/30',
-          !isRead && 'bg-accent/5',
+          'group relative flex gap-3 px-3 py-3 rounded-lg transition-all',
+          'hover:shadow-sm',
+          isSelected && 'bg-muted/40 shadow-sm ring-1 ring-border/50',
+          !isRead && !isSelected && 'bg-primary/[0.03]',
         )}
       >
         {/* Avatar */}
         <div
-          className={cn(
-            'h-10 w-10 rounded-full flex items-center justify-center shrink-0 text-sm font-medium',
-            isRead
-              ? 'bg-muted text-muted-foreground'
-              : 'bg-primary text-primary-foreground',
-          )}
+          className="h-10 w-10 rounded-full flex items-center justify-center shrink-0 text-sm font-medium text-white"
+          style={{ background: avatarGradient }}
         >
-          {getInitials(email.from)}
+          {initials}
         </div>
 
         {/* Content */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <span className={cn('truncate', !isRead && 'font-semibold')}>
-              {getSenderDisplay(email.from)}
+            <span className={cn('truncate text-[13px]', !isRead && 'font-semibold')}>
+              {senderName}
             </span>
+
+            {/* Star - always visible */}
+            {!isTrash && (
+              <button
+                onClick={handleToggleStar}
+                className={cn(
+                  'shrink-0 p-0.5 rounded transition-colors',
+                  isStarred
+                    ? 'text-yellow-500'
+                    : 'text-muted-foreground/30 hover:text-muted-foreground/60',
+                )}
+                title={isStarred ? 'Unstar' : 'Star'}
+              >
+                <HugeiconsIcon
+                  icon={StarIcon}
+                  className={cn('h-3.5 w-3.5', isStarred && 'fill-current')}
+                />
+              </button>
+            )}
+
             <span className="ml-auto text-xs text-muted-foreground shrink-0">
               {formatDate(email.receivedAt)}
             </span>
@@ -215,7 +227,7 @@ export function MessageListItem({ email, isTrash }: MessageListItemProps) {
 
           <div
             className={cn(
-              'truncate text-sm',
+              'truncate text-[13px]',
               !isRead ? 'text-foreground font-medium' : 'text-foreground',
             )}
           >
@@ -223,31 +235,15 @@ export function MessageListItem({ email, isTrash }: MessageListItemProps) {
           </div>
 
           <div className="relative flex items-center">
-            <div className="truncate text-sm text-muted-foreground flex-1 group-hover:[mask-image:linear-gradient(to_right,black_0%,black_60%,transparent_100%)]">
+            <div className="truncate text-xs text-muted-foreground/80 flex-1 group-hover:[mask-image:linear-gradient(to_right,black_0%,black_60%,transparent_100%)]">
               {email.preview}
             </div>
 
             {/* Actions overlay on hover */}
-            <div className="hidden group-hover:flex items-center gap-0.5 absolute right-0 top-0 bottom-0 pl-8 bg-gradient-to-r from-transparent via-background/80 to-background">
-              {!isTrash && (
-                <button
-                  onClick={handleToggleStar}
-                  className={cn(
-                    'p-1.5 rounded-md transition-colors hover:bg-accent',
-                    isStarred && 'text-yellow-500',
-                  )}
-                  title={isStarred ? 'Unstar' : 'Star'}
-                >
-                  <HugeiconsIcon
-                    icon={StarIcon}
-                    className={cn('h-4 w-4', isStarred && 'fill-current')}
-                  />
-                </button>
-              )}
-
+            <div className="hidden group-hover:flex items-center gap-0.5 absolute right-0 top-0 bottom-0 pl-8 bg-gradient-to-r from-transparent via-muted/60 to-muted rounded-r-lg">
               <button
                 onClick={handleToggleRead}
-                className="p-1.5 rounded-md hover:bg-accent transition-colors"
+                className="p-1.5 rounded-md hover:bg-background/80 transition-colors"
                 title={isRead ? 'Mark as unread' : 'Mark as read'}
               >
                 <HugeiconsIcon
@@ -259,7 +255,7 @@ export function MessageListItem({ email, isTrash }: MessageListItemProps) {
               {!isTrash && (
                 <button
                   onClick={handleArchive}
-                  className="p-1.5 rounded-md hover:bg-accent transition-colors"
+                  className="p-1.5 rounded-md hover:bg-background/80 transition-colors"
                   title="Archive"
                 >
                   <HugeiconsIcon icon={Archive02Icon} className="h-4 w-4" />
@@ -269,7 +265,7 @@ export function MessageListItem({ email, isTrash }: MessageListItemProps) {
               <button
                 onClick={handleDelete}
                 className={cn(
-                  'p-1.5 rounded-md hover:bg-accent transition-colors',
+                  'p-1.5 rounded-md hover:bg-background/80 transition-colors',
                   isTrash && 'hover:text-destructive',
                 )}
                 title={isTrash ? 'Delete permanently' : 'Delete'}

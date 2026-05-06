@@ -67,11 +67,13 @@ function MailLayout() {
     setSearchResults(null)
   }
 
+  const firstName = session.username.split('@')[0]?.split('.')[0] || session.username
+
   return (
     <div className="h-screen flex flex-col">
       {/* Header */}
-      <header className="h-14 border-b flex items-center px-4 shrink-0 gap-4">
-        <h1 className="text-lg font-semibold">Kolumba</h1>
+      <header className="h-14 bg-background/80 backdrop-blur-md shadow-[0_1px_3px_0_rgb(0_0_0/0.04)] flex items-center px-4 shrink-0 gap-4 z-10">
+        <h1 className="text-lg font-bold tracking-tight">Kolumba</h1>
 
         {/* Search */}
         <div className="flex-1 max-w-md">
@@ -83,7 +85,7 @@ function MailLayout() {
           ) : (
             <Button
               variant="outline"
-              className="w-full justify-start text-muted-foreground"
+              className="w-full justify-start text-muted-foreground rounded-full shadow-inner shadow-black/[0.03]"
               onClick={() => setShowSearch(true)}
             >
               <HugeiconsIcon icon={Search01Icon} className="h-4 w-4 mr-2" />
@@ -103,7 +105,7 @@ function MailLayout() {
 
           {/* User info */}
           <span className="text-sm text-muted-foreground hidden sm:inline">
-            {session.username}
+            Hello, {firstName}
           </span>
 
           {/* Logout */}
@@ -116,11 +118,11 @@ function MailLayout() {
       {/* Main content */}
       <div className="flex-1 flex min-h-0">
         {/* Sidebar - Mailbox list */}
-        <aside className="w-56 border-r flex flex-col shrink-0">
+        <aside className="w-56 bg-sidebar flex flex-col shrink-0">
           {/* Compose button */}
           <div className="p-3">
             <Link to="/mail/compose">
-              <Button className="w-full">
+              <Button className="w-full rounded-full h-10 shadow-sm font-semibold">
                 <HugeiconsIcon icon={PlusSignIcon} className="h-4 w-4 mr-2" />
                 Compose
               </Button>
@@ -143,10 +145,10 @@ function MailLayoutPending() {
   return (
     <div className="h-screen flex flex-col">
       {/* Header */}
-      <header className="h-14 border-b flex items-center px-4 shrink-0 gap-4">
-        <h1 className="text-lg font-semibold">Kolumba</h1>
+      <header className="h-14 bg-background/80 backdrop-blur-md shadow-[0_1px_3px_0_rgb(0_0_0/0.04)] flex items-center px-4 shrink-0 gap-4 z-10">
+        <h1 className="text-lg font-bold tracking-tight">Kolumba</h1>
         <div className="flex-1 max-w-md">
-          <Skeleton className="h-9 w-full" />
+          <Skeleton className="h-9 w-full rounded-full" />
         </div>
         <div className="flex items-center gap-2">
           <Skeleton className="h-8 w-8 rounded-full" />
@@ -156,16 +158,16 @@ function MailLayoutPending() {
       </header>
 
       <div className="flex-1 flex min-h-0">
-        <aside className="w-56 border-r flex flex-col shrink-0">
+        <aside className="w-56 bg-sidebar flex flex-col shrink-0">
           <div className="p-3">
-            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-10 w-full rounded-full" />
           </div>
           <div className="flex-1 overflow-y-auto py-2 px-2">
             <div className="space-y-1">
               {[...Array(6)].map((_, i) => (
                 <div
                   key={i}
-                  className="flex items-center gap-3 rounded-md px-3 py-2"
+                  className="flex items-center gap-3 rounded-lg px-3 py-2.5"
                 >
                   <Skeleton className="h-4 w-4" />
                   <Skeleton className="h-4 flex-1" />
@@ -193,10 +195,10 @@ function MailLayoutError({
   return (
     <div className="h-screen flex flex-col">
       {/* Header */}
-      <header className="h-14 border-b flex items-center px-4 shrink-0 gap-4">
-        <h1 className="text-lg font-semibold">Kolumba</h1>
+      <header className="h-14 bg-background/80 backdrop-blur-md shadow-[0_1px_3px_0_rgb(0_0_0/0.04)] flex items-center px-4 shrink-0 gap-4 z-10">
+        <h1 className="text-lg font-bold tracking-tight">Kolumba</h1>
         <div className="flex-1 max-w-md">
-          <Skeleton className="h-9 w-full" />
+          <Skeleton className="h-9 w-full rounded-full" />
         </div>
         <div className="flex items-center gap-2">
           <Skeleton className="h-8 w-8 rounded-full" />
@@ -206,9 +208,9 @@ function MailLayoutError({
       </header>
 
       <div className="flex-1 flex min-h-0">
-        <aside className="w-56 border-r flex flex-col shrink-0">
+        <aside className="w-56 bg-sidebar flex flex-col shrink-0">
           <div className="p-3">
-            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-10 w-full rounded-full" />
           </div>
         </aside>
         <main className="flex-1 flex min-w-0">

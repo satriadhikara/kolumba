@@ -5,9 +5,12 @@
 
 import { createServerFn } from '@tanstack/react-start'
 import { redirect } from '@tanstack/react-router'
+import { mockSession } from './mock-data'
 import { isSessionValid, useAppSession } from './session'
 import type { SessionData } from './session'
 import { JMAPClientError, discoverJMAPSession } from '@/lib/jmap/client'
+
+const BYPASS_AUTH = process.env.BYPASS_AUTH === 'true'
 
 /**
  * Login to JMAP server
@@ -16,6 +19,8 @@ import { JMAPClientError, discoverJMAPSession } from '@/lib/jmap/client'
 export const loginFn = createServerFn({ method: 'POST' })
   .inputValidator((data: { username: string; password: string }) => data)
   .handler(async ({ data }) => {
+    if (BYPASS_AUTH) return { success: true }
+
     const { username, password } = data
 
     const jmapUrl = process.env.JMAP_URL
@@ -74,6 +79,8 @@ export const logoutFn = createServerFn({ method: 'POST' }).handler(async () => {
  */
 export const getSessionFn = createServerFn({ method: 'GET' }).handler(
   async (): Promise<SessionData | null> => {
+    if (BYPASS_AUTH) return mockSession
+
     const session = await useAppSession()
 
     if (!isSessionValid(session.data)) {
@@ -90,6 +97,8 @@ export const getSessionFn = createServerFn({ method: 'GET' }).handler(
  */
 export const requireAuthFn = createServerFn({ method: 'GET' }).handler(
   async (): Promise<SessionData> => {
+    if (BYPASS_AUTH) return mockSession
+
     const session = await useAppSession()
 
     if (!isSessionValid(session.data)) {

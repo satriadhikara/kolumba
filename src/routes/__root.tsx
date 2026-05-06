@@ -74,6 +74,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       </head>
       <body className="antialiased">
         {children}
+        <div className="noise-overlay" aria-hidden="true" />
         <TanStackDevtools
           config={{
             position: 'bottom-right',

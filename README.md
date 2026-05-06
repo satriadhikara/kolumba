@@ -1,5 +1,7 @@
 # Kolumba
 
+![Kolumba](others/screenshot.png)
+
 Modern open-source webmail client for [Stalwart Mail Server](https://stalw.art/), built on the JMAP protocol.
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
@@ -55,9 +57,13 @@ Open [http://localhost:3000](http://localhost:3000) and log in with your Stalwar
 
 ```env
 SESSION_SECRET=your-32-character-secret-here  # Required for production
+BYPASS_AUTH=true                              # Optional: local mock UI preview only
 ```
 
 Note: The JMAP URL is entered per-user at login, not configured globally.
+
+Set `BYPASS_AUTH=true` when developing locally to skip login and use bundled
+mock mailboxes, messages, and identities. Do not enable this in production.
 
 ## Deployment
 
