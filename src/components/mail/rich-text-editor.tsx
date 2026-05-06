@@ -42,7 +42,7 @@ function ToolbarButton({
       onClick={onClick}
       title={title}
       className={cn(
-        'h-7 w-7 flex items-center justify-center rounded-md transition-colors',
+        'h-7 w-7 flex items-center justify-center rounded-full transition-colors',
         'hover:bg-muted',
         isActive ? 'bg-muted text-accent' : 'text-muted-foreground',
       )}
@@ -64,23 +64,23 @@ function LinkInput({
   onCancel: () => void
 }) {
   return (
-    <div className="flex items-center gap-2 p-2 border-b">
+    <div className="flex items-center gap-2 px-2 py-1.5 border-b border-border/50">
       <Input
         type="url"
         value={url}
         onChange={(e) => onChange(e.target.value)}
         placeholder="https://"
-        className="h-7 text-sm"
+        className="h-7 text-sm rounded-lg"
         autoFocus
         onKeyDown={(e) => {
           if (e.key === 'Enter') onSubmit()
           if (e.key === 'Escape') onCancel()
         }}
       />
-      <Button size="sm" variant="ghost" onClick={onSubmit} className="h-7">
+      <Button size="sm" variant="ghost" onClick={onSubmit} className="h-7 rounded-full">
         Save
       </Button>
-      <Button size="sm" variant="ghost" onClick={onCancel} className="h-7">
+      <Button size="sm" variant="ghost" onClick={onCancel} className="h-7 rounded-full">
         Cancel
       </Button>
     </div>
@@ -153,9 +153,9 @@ export function RichTextEditor({
   }
 
   return (
-    <div className="flex-1 flex flex-col min-h-0 border rounded-md bg-background">
+    <div className="flex-1 flex flex-col min-h-0 border border-border/50 rounded-xl bg-background shadow-sm">
       {/* Toolbar */}
-      <div className="flex items-center gap-0.5 p-1 border-b bg-muted/30">
+      <div className="flex items-center gap-1 px-2 py-1.5 border-b border-border/50 bg-muted/20">
         {/* Text Formatting */}
         <ToolbarButton
           icon={TextBoldIcon}
@@ -182,7 +182,7 @@ export function RichTextEditor({
           title="Strikethrough"
         />
 
-        <div className="w-px h-5 bg-border mx-1" />
+        <div className="w-px h-5 bg-border/50 mx-1" />
 
         {/* Link */}
         <ToolbarButton
@@ -199,7 +199,7 @@ export function RichTextEditor({
           title="Link"
         />
 
-        <div className="w-px h-5 bg-border mx-1" />
+        <div className="w-px h-5 bg-border/50 mx-1" />
 
         {/* Lists */}
         <ToolbarButton
@@ -215,7 +215,7 @@ export function RichTextEditor({
           title="Numbered List"
         />
 
-        <div className="w-px h-5 bg-border mx-1" />
+        <div className="w-px h-5 bg-border/50 mx-1" />
 
         {/* Blockquote */}
         <ToolbarButton
@@ -226,9 +226,9 @@ export function RichTextEditor({
         />
 
         {/* Headings */}
-        <div className="w-px h-5 bg-border mx-1" />
+        <div className="w-px h-5 bg-border/50 mx-1" />
         <select
-          className="h-7 px-2 text-xs bg-transparent border rounded-md focus:outline-none focus:ring-1 focus:ring-ring"
+          className="h-7 px-2 text-xs bg-transparent border border-border/50 rounded-full focus:outline-none focus:ring-1 focus:ring-ring"
           value={
             editor.isActive('heading', { level: 1 })
               ? '1'
@@ -275,7 +275,7 @@ export function RichTextEditor({
       <div className="flex-1 overflow-y-auto">
         <EditorContent
           editor={editor}
-          className="min-h-[200px] p-3 prose prose-zinc dark:prose-invert max-w-none focus:outline-none"
+          className="min-h-[200px] p-4 prose prose-stone dark:prose-invert max-w-none focus:outline-none"
         />
       </div>
 

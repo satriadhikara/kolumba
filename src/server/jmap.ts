@@ -6,6 +6,12 @@
 
 import { createServerFn } from '@tanstack/react-start'
 import { redirect } from '@tanstack/react-router'
+import {
+  getMockEmail,
+  mockEmailList,
+  mockIdentities,
+  mockMailboxes,
+} from './mock-data'
 import { isSessionValid, useAppSession } from './session'
 import type { Email, EmailListItem, Identity, Mailbox } from '@/lib/jmap/types'
 import { createJMAPClient, resetCallIdCounter } from '@/lib/jmap/client'
@@ -15,6 +21,8 @@ import {
   IdentityMethods,
   MailboxMethods,
 } from '@/lib/jmap/methods'
+
+const BYPASS_AUTH = process.env.BYPASS_AUTH === 'true'
 
 /**
  * Helper to get authenticated JMAP client
@@ -50,6 +58,8 @@ async function getAuthenticatedClient() {
  */
 export const getMailboxesFn = createServerFn({ method: 'GET' }).handler(
   async (): Promise<Array<Mailbox>> => {
+    if (BYPASS_AUTH) return mockMailboxes
+
     const { client, accountId } = await getAuthenticatedClient()
     const result = await MailboxMethods.getAll(client, accountId)
     return result.list
@@ -62,6 +72,8 @@ export const getMailboxesFn = createServerFn({ method: 'GET' }).handler(
 export const createMailboxFn = createServerFn({ method: 'POST' })
   .inputValidator((data: { name: string; parentId?: string }) => data)
   .handler(async ({ data }) => {
+    if (BYPASS_AUTH) return { id: 'mock-new', name: data.name }
+
     const { client, accountId } = await getAuthenticatedClient()
     const result = await MailboxMethods.set(client, accountId, {
       create: {
@@ -87,6 +99,8 @@ export const createMailboxFn = createServerFn({ method: 'POST' })
 export const deleteMailboxFn = createServerFn({ method: 'POST' })
   .inputValidator((data: { mailboxId: string }) => data)
   .handler(async ({ data }) => {
+    if (BYPASS_AUTH) return { success: true }
+
     const { client, accountId } = await getAuthenticatedClient()
     const result = await MailboxMethods.set(client, accountId, {
       destroy: [data.mailboxId],
@@ -121,6 +135,19 @@ export const getEmailsFn = createServerFn({ method: 'GET' })
       total: number
       position: number
     }> => {
+      if (BYPASS_AUTH) {
+        const filtered = mockEmailList.filter(
+          (e) => e.mailboxIds[data.mailboxId],
+        )
+        const start = data.position ?? 0
+        const limit = data.limit ?? 50
+        return {
+          emails: filtered.slice(start, start + limit),
+          total: filtered.length,
+          position: start,
+        }
+      }
+
       const { client, accountId } = await getAuthenticatedClient()
 
       const result = await EmailMethods.queryAndGet(client, accountId, {
@@ -143,6 +170,8 @@ export const getEmailsFn = createServerFn({ method: 'GET' })
 export const getEmailFn = createServerFn({ method: 'GET' })
   .inputValidator((data: { emailId: string }) => data)
   .handler(async ({ data }): Promise<Email | null> => {
+    if (BYPASS_AUTH) return getMockEmail(data.emailId)
+
     const { client, accountId } = await getAuthenticatedClient()
     const result = await EmailMethods.get(client, accountId, [data.emailId])
 
@@ -159,6 +188,8 @@ export const getEmailFn = createServerFn({ method: 'GET' })
 export const markAsReadFn = createServerFn({ method: 'POST' })
   .inputValidator((data: { emailId: string }) => data)
   .handler(async ({ data }) => {
+    if (BYPASS_AUTH) return { success: true }
+
     const { client, accountId } = await getAuthenticatedClient()
     await EmailMethods.addKeyword(client, accountId, data.emailId, '$seen')
     return { success: true }
@@ -170,6 +201,8 @@ export const markAsReadFn = createServerFn({ method: 'POST' })
 export const markAsUnreadFn = createServerFn({ method: 'POST' })
   .inputValidator((data: { emailId: string }) => data)
   .handler(async ({ data }) => {
+    if (BYPASS_AUTH) return { success: true }
+
     const { client, accountId } = await getAuthenticatedClient()
     await EmailMethods.removeKeyword(client, accountId, data.emailId, '$seen')
     return { success: true }
@@ -181,6 +214,8 @@ export const markAsUnreadFn = createServerFn({ method: 'POST' })
 export const toggleStarFn = createServerFn({ method: 'POST' })
   .inputValidator((data: { emailId: string; starred: boolean }) => data)
   .handler(async ({ data }) => {
+    if (BYPASS_AUTH) return { success: true }
+
     const { client, accountId } = await getAuthenticatedClient()
 
     if (data.starred) {
@@ -203,6 +238,8 @@ export const toggleStarFn = createServerFn({ method: 'POST' })
 export const moveEmailFn = createServerFn({ method: 'POST' })
   .inputValidator((data: { emailId: string; toMailboxId: string }) => data)
   .handler(async ({ data }) => {
+    if (BYPASS_AUTH) return { success: true }
+
     const { client, accountId } = await getAuthenticatedClient()
     await EmailMethods.move(client, accountId, data.emailId, data.toMailboxId)
     return { success: true }
@@ -214,6 +251,8 @@ export const moveEmailFn = createServerFn({ method: 'POST' })
 export const deleteEmailFn = createServerFn({ method: 'POST' })
   .inputValidator((data: { emailId: string; permanent?: boolean }) => data)
   .handler(async ({ data }) => {
+    if (BYPASS_AUTH) return { success: true }
+
     const { client, accountId } = await getAuthenticatedClient()
 
     if (data.permanent) {
@@ -240,6 +279,8 @@ export const deleteEmailFn = createServerFn({ method: 'POST' })
 export const archiveEmailFn = createServerFn({ method: 'POST' })
   .inputValidator((data: { emailId: string }) => data)
   .handler(async ({ data }) => {
+    if (BYPASS_AUTH) return { success: true }
+
     const { client, accountId } = await getAuthenticatedClient()
     const mailboxes = await MailboxMethods.getAll(client, accountId)
     const archive = MailboxMethods.findByRole(mailboxes.list, 'archive')
@@ -267,6 +308,21 @@ export const searchEmailsFn = createServerFn({ method: 'GET' })
       emails: Array<EmailListItem>
       total: number
     }> => {
+      if (BYPASS_AUTH) {
+        const q = data.query.toLowerCase()
+        const filtered = mockEmailList.filter(
+          (e) =>
+            e.subject?.toLowerCase().includes(q) ||
+            e.preview.toLowerCase().includes(q) ||
+            e.from?.some(
+              (f) =>
+                f.name?.toLowerCase().includes(q) ||
+                f.email.toLowerCase().includes(q),
+            ),
+        )
+        return { emails: filtered, total: filtered.length }
+      }
+
       const { client, accountId } = await getAuthenticatedClient()
 
       const result = await EmailMethods.search(client, accountId, data.query, {
@@ -290,6 +346,8 @@ export const searchEmailsFn = createServerFn({ method: 'GET' })
  */
 export const getIdentitiesFn = createServerFn({ method: 'GET' }).handler(
   async (): Promise<Array<Identity>> => {
+    if (BYPASS_AUTH) return mockIdentities
+
     const { client, accountId } = await getAuthenticatedClient()
     const result = await IdentityMethods.getAll(client, accountId)
     return result.list
@@ -314,6 +372,8 @@ export const sendEmailFn = createServerFn({ method: 'POST' })
     }) => data,
   )
   .handler(async ({ data }) => {
+    if (BYPASS_AUTH) return { success: true }
+
     const { client, accountId } = await getAuthenticatedClient()
 
     // Get identities to find the from address
@@ -425,6 +485,8 @@ export const saveDraftFn = createServerFn({ method: 'POST' })
     }) => data,
   )
   .handler(async ({ data }) => {
+    if (BYPASS_AUTH) return { success: true, draftId: 'mock-draft-001' }
+
     const { client, accountId } = await getAuthenticatedClient()
 
     // Get drafts mailbox

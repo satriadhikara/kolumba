@@ -17,6 +17,7 @@ import { cn } from '@/lib/utils'
 import { JMAPKeywords } from '@/lib/jmap/types'
 import { archiveEmailFn, deleteEmailFn, toggleStarFn } from '@/server/jmap'
 import { useConfirmDialog } from '@/components/ui/confirm-dialog'
+import { getAvatarGradient, getInitials } from '@/lib/avatar'
 
 interface MessageViewProps {
   email: Email
@@ -49,15 +50,10 @@ function formatAddresses(
   return addrs.map(formatAddress).join(', ')
 }
 
-function getInitials(from: Email['from']): string {
-  if (!from || from.length === 0) return '??'
+function getSenderName(from: Email['from']): string {
+  if (!from || from.length === 0) return 'Unknown'
   const sender = from[0]!
-  const name = sender.name || sender.email
-  const parts = name.split(' ').filter(Boolean)
-  if (parts.length >= 2) {
-    return (parts[0]![0]! + parts[1]![0]!).toUpperCase()
-  }
-  return name.slice(0, 2).toUpperCase()
+  return sender.name || sender.email
 }
 
 function getEmailBody(email: Email): {
@@ -93,6 +89,10 @@ export function MessageView({ email, isTrash }: MessageViewProps) {
   const params = useParams({ from: '/_authed/mail/$mailboxId/$messageId' })
   const isStarred = email.keywords[JMAPKeywords.FLAGGED]
   const { html, text } = getEmailBody(email)
+
+  const senderName = getSenderName(email.from)
+  const initials = getInitials(senderName)
+  const avatarGradient = getAvatarGradient(senderName)
 
   const { confirm, ConfirmDialogComponent } = useConfirmDialog()
 
@@ -130,43 +130,43 @@ export function MessageView({ email, isTrash }: MessageViewProps) {
     return () => observer.disconnect()
   }, [])
 
-  // Generate theme-aware iframe styles
+  // Generate theme-aware iframe styles with warm tones
   const iframeStyles = isDarkMode
     ? `
         body {
           font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
           font-size: 14px;
           line-height: 1.6;
-          color: #e5e5e5;
-          background: #0a0a0a;
+          color: #e8e4df;
+          background: #1a1816;
           margin: 0;
           padding: 0;
         }
         img { max-width: 100%; height: auto; }
         a { color: #818cf8; text-decoration: underline; }
-        blockquote { border-left: 3px solid #333; padding-left: 1em; margin-left: 0; }
-        pre { background: #1a1a1a; padding: 1em; border-radius: 4px; overflow-x: auto; }
-        code { background: #1a1a1a; padding: 0.2em 0.4em; border-radius: 3px; font-size: 0.9em; }
+        blockquote { border-left: 3px solid #3a3632; padding-left: 1em; margin-left: 0; }
+        pre { background: #22201e; padding: 1em; border-radius: 4px; overflow-x: auto; }
+        code { background: #22201e; padding: 0.2em 0.4em; border-radius: 3px; font-size: 0.9em; }
         table { border-collapse: collapse; width: 100%; }
-        th, td { border: 1px solid #333; padding: 8px; text-align: left; }
+        th, td { border: 1px solid #3a3632; padding: 8px; text-align: left; }
       `
     : `
         body {
           font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
           font-size: 14px;
           line-height: 1.6;
-          color: #1a1a1a;
-          background: #ffffff;
+          color: #2a2520;
+          background: #faf9f7;
           margin: 0;
           padding: 0;
         }
         img { max-width: 100%; height: auto; }
-        a { color: #4f46e5; text-decoration: underline; }
-        blockquote { border-left: 3px solid #e5e5e5; padding-left: 1em; margin-left: 0; }
-        pre { background: #f5f5f5; padding: 1em; border-radius: 4px; overflow-x: auto; }
-        code { background: #f5f5f5; padding: 0.2em 0.4em; border-radius: 3px; font-size: 0.9em; }
+        a { color: #4338ca; text-decoration: underline; }
+        blockquote { border-left: 3px solid #e5e0db; padding-left: 1em; margin-left: 0; }
+        pre { background: #f5f2ef; padding: 1em; border-radius: 4px; overflow-x: auto; }
+        code { background: #f5f2ef; padding: 0.2em 0.4em; border-radius: 3px; font-size: 0.9em; }
         table { border-collapse: collapse; width: 100%; }
-        th, td { border: 1px solid #e5e5e5; padding: 8px; text-align: left; }
+        th, td { border: 1px solid #e5e0db; padding: 8px; text-align: left; }
       `
 
   const handleToggleStar = async () => {
@@ -252,89 +252,113 @@ export function MessageView({ email, isTrash }: MessageViewProps) {
 
   return (
     <div className="h-full flex flex-col">
-      {/* Toolbar */}
-      <div className="h-12 border-b flex items-center gap-1 px-4 shrink-0">
-        <Link
-          to="/mail/$mailboxId"
-          params={{ mailboxId: params.mailboxId }}
-          className="lg:hidden p-2 rounded-md hover:bg-muted transition-colors mr-2"
-        >
-          <HugeiconsIcon icon={ArrowLeft01Icon} className="h-4 w-4" />
-        </Link>
+      {/* Toolbar — floating pill */}
+      <div className="px-4 py-2 shrink-0">
+        <div className="flex items-center gap-1 bg-muted/40 backdrop-blur-sm rounded-full w-fit px-2 py-1">
+          <Link
+            to="/mail/$mailboxId"
+            params={{ mailboxId: params.mailboxId }}
+            className="lg:hidden p-2 rounded-full hover:bg-background/80 transition-colors mr-1"
+          >
+            <HugeiconsIcon icon={ArrowLeft01Icon} className="h-4 w-4" />
+          </Link>
 
-        {!isTrash && (
-          <>
-            <Button variant="ghost" size="sm" onClick={handleReply}>
-              <HugeiconsIcon
-                icon={ArrowTurnBackwardIcon}
-                className="h-4 w-4 mr-1"
-              />
-              Reply
-            </Button>
+          {!isTrash && (
+            <>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleReply}
+                className="rounded-full"
+              >
+                <HugeiconsIcon
+                  icon={ArrowTurnBackwardIcon}
+                  className="h-4 w-4 mr-1"
+                />
+                Reply
+              </Button>
 
-            <Button variant="ghost" size="sm" onClick={handleReplyAll}>
-              <HugeiconsIcon
-                icon={ArrowTurnBackwardIcon}
-                className="h-4 w-4 mr-1"
-              />
-              Reply All
-            </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleReplyAll}
+                className="rounded-full"
+              >
+                <HugeiconsIcon
+                  icon={ArrowTurnBackwardIcon}
+                  className="h-4 w-4 mr-1"
+                />
+                Reply All
+              </Button>
 
-            <Button variant="ghost" size="sm" onClick={handleForward}>
-              <HugeiconsIcon
-                icon={ArrowTurnForwardIcon}
-                className="h-4 w-4 mr-1"
-              />
-              Forward
-            </Button>
-          </>
-        )}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleForward}
+                className="rounded-full"
+              >
+                <HugeiconsIcon
+                  icon={ArrowTurnForwardIcon}
+                  className="h-4 w-4 mr-1"
+                />
+                Forward
+              </Button>
 
-        <div className="flex-1" />
+              <div className="w-px h-5 bg-border/50 mx-1" />
 
-        {!isTrash && (
-          <>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleToggleStar}
-              className={cn(isStarred && 'text-yellow-500')}
-            >
-              <HugeiconsIcon
-                icon={StarIcon}
-                className={cn('h-4 w-4', isStarred && 'fill-current')}
-              />
-            </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleToggleStar}
+                className={cn('rounded-full', isStarred && 'text-yellow-500')}
+              >
+                <HugeiconsIcon
+                  icon={StarIcon}
+                  className={cn('h-4 w-4', isStarred && 'fill-current')}
+                />
+              </Button>
 
-            <Button variant="ghost" size="icon" onClick={handleArchive}>
-              <HugeiconsIcon icon={Archive02Icon} className="h-4 w-4" />
-            </Button>
-          </>
-        )}
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleArchive}
+                className="rounded-full"
+              >
+                <HugeiconsIcon icon={Archive02Icon} className="h-4 w-4" />
+              </Button>
+            </>
+          )}
 
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={handleDelete}
-          className={cn(isTrash && 'hover:text-destructive')}
-        >
-          <HugeiconsIcon icon={Delete02Icon} className="h-4 w-4" />
-        </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={handleDelete}
+            className={cn(
+              'rounded-full',
+              isTrash && 'hover:text-destructive',
+            )}
+          >
+            <HugeiconsIcon icon={Delete02Icon} className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
 
       {/* Email content */}
       <div className="flex-1 overflow-y-auto">
-        <div className="max-w-4xl mx-auto p-6">
+        <div className="max-w-4xl mx-auto p-8">
           {/* Subject */}
-          <h1 className="text-2xl font-semibold mb-6">
+          <h1 className="text-2xl font-bold tracking-tight leading-tight mb-6">
             {email.subject || '(No subject)'}
           </h1>
 
           {/* Header */}
           <div className="flex gap-4 mb-6">
-            {/* Avatar */}
-            <div className="h-12 w-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-lg font-medium shrink-0">
-              {getInitials(email.from)}
+            {/* Avatar — gradient */}
+            <div
+              className="h-12 w-12 rounded-full flex items-center justify-center text-lg font-medium text-white shrink-0"
+              style={{ background: avatarGradient }}
+            >
+              {initials}
             </div>
 
             {/* From/To info */}
@@ -365,7 +389,7 @@ export function MessageView({ email, isTrash }: MessageViewProps) {
           {email.hasAttachment &&
             email.attachments &&
             email.attachments.length > 0 && (
-              <div className="mb-6 p-4 bg-muted/50 rounded-lg">
+              <div className="mb-6 p-4 rounded-xl border border-border/50">
                 <div className="flex items-center gap-2 text-sm font-medium mb-2">
                   <HugeiconsIcon icon={AttachmentIcon} className="h-4 w-4" />
                   <span>Attachments ({email.attachments.length})</span>
@@ -374,7 +398,7 @@ export function MessageView({ email, isTrash }: MessageViewProps) {
                   {email.attachments.map((att, i) => (
                     <div
                       key={att.blobId || i}
-                      className="px-3 py-1.5 bg-background rounded border text-sm"
+                      className="px-3 py-1.5 bg-background rounded-lg border border-border/50 text-sm shadow-sm"
                     >
                       {att.name || `Attachment ${i + 1}`}
                       {att.size && (
@@ -389,7 +413,7 @@ export function MessageView({ email, isTrash }: MessageViewProps) {
             )}
 
           {/* Body */}
-          <div className="prose prose-zinc dark:prose-invert max-w-none">
+          <div className="prose prose-stone dark:prose-invert max-w-none">
             {html ? (
               <iframe
                 srcDoc={`

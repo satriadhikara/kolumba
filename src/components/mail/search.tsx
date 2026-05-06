@@ -62,7 +62,7 @@ export function Search({ onResults, onClose }: SearchProps) {
           placeholder="Search emails..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          className="pl-10 pr-10"
+          className="pl-10 pr-10 rounded-full shadow-inner shadow-black/[0.03]"
           autoFocus
         />
         {query && (

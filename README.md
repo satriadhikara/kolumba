@@ -1,5 +1,7 @@
 # Kolumba
 
+![Kolumba](others/screenshot.png)
+
 Modern open-source webmail client for [Stalwart Mail Server](https://stalw.art/), built on the JMAP protocol.
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)

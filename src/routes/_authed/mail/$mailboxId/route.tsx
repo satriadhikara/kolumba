@@ -49,10 +49,12 @@ function MailboxRoute() {
   return (
     <div className="flex flex-1 min-w-0">
       {/* Message list */}
-      <div className="w-80 border-r flex flex-col shrink-0 lg:w-96">
-        <div className="h-12 border-b flex items-center px-4 shrink-0">
+      <div className="w-80 bg-muted/10 flex flex-col shrink-0 lg:w-96">
+        <div className="h-12 shadow-[0_1px_2px_0_rgb(0_0_0/0.03)] flex items-center px-4 shrink-0">
           <h2 className="font-medium truncate">{mailbox?.name || 'Mailbox'}</h2>
-          <span className="ml-2 text-sm text-muted-foreground">{total}</span>
+          <span className="ml-2 text-xs tabular-nums px-1.5 py-0.5 rounded-full bg-muted text-muted-foreground">
+            {total}
+          </span>
         </div>
         <MessageList emails={emails} isTrash={isTrash} />
       </div>
@@ -68,14 +70,14 @@ function MailboxRoute() {
 function MailboxPending() {
   return (
     <div className="flex flex-1 min-w-0">
-      <div className="w-80 border-r flex flex-col shrink-0 lg:w-96">
-        <div className="h-12 border-b flex items-center px-4 shrink-0 gap-2">
+      <div className="w-80 bg-muted/10 flex flex-col shrink-0 lg:w-96">
+        <div className="h-12 shadow-[0_1px_2px_0_rgb(0_0_0/0.03)] flex items-center px-4 shrink-0 gap-2">
           <Skeleton className="h-5 w-24" />
-          <Skeleton className="h-4 w-8" />
+          <Skeleton className="h-5 w-8 rounded-full" />
         </div>
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 overflow-y-auto p-2 space-y-1">
           {[...Array(8)].map((_, i) => (
-            <div key={i} className="flex items-start gap-3 px-4 py-3 border-b">
+            <div key={i} className="flex items-start gap-3 px-3 py-3 rounded-lg">
               <Skeleton className="h-10 w-10 rounded-full shrink-0" />
               <div className="flex-1 min-w-0 space-y-2">
                 <Skeleton className="h-4 w-32" />
@@ -97,8 +99,8 @@ function MailboxPending() {
 function MailboxError({ error, reset }: { error: Error; reset: () => void }) {
   return (
     <div className="flex flex-1 min-w-0">
-      <div className="w-80 border-r flex flex-col shrink-0 lg:w-96">
-        <div className="h-12 border-b flex items-center px-4 shrink-0">
+      <div className="w-80 bg-muted/10 flex flex-col shrink-0 lg:w-96">
+        <div className="h-12 shadow-[0_1px_2px_0_rgb(0_0_0/0.03)] flex items-center px-4 shrink-0">
           <Skeleton className="h-5 w-24" />
         </div>
         <ErrorView error={error} reset={reset} />

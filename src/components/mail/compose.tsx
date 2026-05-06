@@ -7,7 +7,6 @@ import { RichTextEditor } from './rich-text-editor'
 import type { Email, Identity } from '@/lib/jmap/types'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { sendEmailFn } from '@/server/jmap'
 
 interface ComposeProps {
@@ -163,8 +162,8 @@ export function Compose({
 
   return (
     <div className="h-full w-full flex flex-col bg-background">
-      {/* Header */}
-      <div className="h-14 border-b flex items-center px-4 shrink-0">
+      {/* Header — glass effect */}
+      <div className="h-14 bg-background/80 backdrop-blur-md shadow-[0_1px_3px_0_rgb(0_0_0/0.04)] flex items-center px-4 shrink-0">
         <h2 className="text-lg font-semibold">
           {mode === 'new'
             ? 'New Message'
@@ -173,7 +172,7 @@ export function Compose({
               : 'Reply'}
         </h2>
         <div className="flex-1" />
-        <Button variant="ghost" size="icon" onClick={onClose}>
+        <Button variant="ghost" size="icon" onClick={onClose} className="rounded-full">
           <HugeiconsIcon icon={Cancel01Icon} className="h-5 w-5" />
         </Button>
       </div>
@@ -186,14 +185,17 @@ export function Compose({
         {/* From (if multiple identities) */}
         {identities.length > 1 && (
           <div className="flex items-center gap-2">
-            <Label htmlFor="from" className="w-16 text-right shrink-0">
+            <label
+              htmlFor="from"
+              className="w-16 text-right shrink-0 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground"
+            >
               From
-            </Label>
+            </label>
             <select
               id="from"
               value={identityId}
               onChange={(e) => setIdentityId(e.target.value)}
-              className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm"
+              className="flex h-10 w-full rounded-xl border border-input bg-transparent px-3 py-1 text-sm"
             >
               {identities.map((identity) => (
                 <option key={identity.id} value={identity.id}>
@@ -208,9 +210,12 @@ export function Compose({
 
         {/* To */}
         <div className="flex items-center gap-2">
-          <Label htmlFor="to" className="w-16 text-right shrink-0">
+          <label
+            htmlFor="to"
+            className="w-16 text-right shrink-0 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground"
+          >
             To
-          </Label>
+          </label>
           <Input
             id="to"
             type="text"
@@ -218,58 +223,66 @@ export function Compose({
             onChange={(e) => setTo(e.target.value)}
             placeholder="recipient@example.com"
             required
-            className="flex-1"
+            className="flex-1 h-10 rounded-xl"
           />
         </div>
 
         {/* CC */}
         <div className="flex items-center gap-2">
-          <Label htmlFor="cc" className="w-16 text-right shrink-0">
+          <label
+            htmlFor="cc"
+            className="w-16 text-right shrink-0 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground"
+          >
             Cc
-          </Label>
+          </label>
           <Input
             id="cc"
             type="text"
             value={cc}
             onChange={(e) => setCc(e.target.value)}
             placeholder="cc@example.com"
-            className="flex-1"
+            className="flex-1 h-10 rounded-xl"
           />
         </div>
 
         {/* BCC */}
         <div className="flex items-center gap-2">
-          <Label htmlFor="bcc" className="w-16 text-right shrink-0">
+          <label
+            htmlFor="bcc"
+            className="w-16 text-right shrink-0 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground"
+          >
             Bcc
-          </Label>
+          </label>
           <Input
             id="bcc"
             type="text"
             value={bcc}
             onChange={(e) => setBcc(e.target.value)}
             placeholder="bcc@example.com"
-            className="flex-1"
+            className="flex-1 h-10 rounded-xl"
           />
         </div>
 
         {/* Subject */}
         <div className="flex items-center gap-2">
-          <Label htmlFor="subject" className="w-16 text-right shrink-0">
+          <label
+            htmlFor="subject"
+            className="w-16 text-right shrink-0 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground"
+          >
             Subject
-          </Label>
+          </label>
           <Input
             id="subject"
             type="text"
             value={subject}
             onChange={(e) => setSubject(e.target.value)}
             placeholder="Subject"
-            className="flex-1"
+            className="flex-1 h-10 rounded-xl"
           />
         </div>
 
         {/* Body - Rich Text Editor */}
         <div className="flex-1 flex flex-col min-h-0">
-          <Label className="sr-only">Message</Label>
           <RichTextEditor
             value={body}
             onChange={setBody}
@@ -279,18 +292,27 @@ export function Compose({
 
         {/* Error */}
         {error && (
-          <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
+          <div className="rounded-xl bg-destructive/10 p-3 text-sm text-destructive">
             {error}
           </div>
         )}
 
         {/* Actions */}
         <div className="shrink-0 flex gap-2">
-          <Button type="submit" disabled={isLoading}>
+          <Button
+            type="submit"
+            disabled={isLoading}
+            className="rounded-full h-10 font-semibold"
+          >
             <HugeiconsIcon icon={MailSend01Icon} className="h-4 w-4 mr-2" />
             {isLoading ? 'Sending...' : 'Send'}
           </Button>
-          <Button type="button" variant="outline" onClick={onClose}>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onClose}
+            className="rounded-full h-10"
+          >
             Cancel
           </Button>
         </div>

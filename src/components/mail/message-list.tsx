@@ -16,7 +16,7 @@ export function MessageList({ emails, isTrash }: MessageListProps) {
   }
 
   return (
-    <div className="flex-1 overflow-y-auto">
+    <div className="flex-1 overflow-y-auto p-2 space-y-1">
       {emails.map((email) => (
         <MessageListItem key={email.id} email={email} isTrash={isTrash} />
       ))}
