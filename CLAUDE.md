@@ -15,6 +15,7 @@ bun run dev          # Start dev server on port 3000
 bun run build        # Production build
 bun run test         # Run tests (Vitest)
 bun run lint         # Run ESLint
+bun run typecheck    # Type-check with tsc
 bun run check        # Format with Prettier and fix ESLint issues
 bun run preview      # Preview production build
 bun run format       # Run Prettier (check only)

@@ -197,7 +197,9 @@ export function MessageListItem({ email, isTrash }: MessageListItemProps) {
         {/* Content */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <span className={cn('truncate text-[13px]', !isRead && 'font-semibold')}>
+            <span
+              className={cn('truncate text-[13px]', !isRead && 'font-semibold')}
+            >
               {senderName}
             </span>
 
