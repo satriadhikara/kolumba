@@ -9,27 +9,27 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as LoginRouteImport } from './routes/login'
-import { Route as AuthedRouteImport } from './routes/_authed'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthedRouteImport } from './routes/_authed'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthedMailRouteRouteImport } from './routes/_authed/mail/route'
-import { Route as AuthedMailComposeRouteImport } from './routes/_authed/mail/compose'
 import { Route as AuthedMailMailboxIdRouteRouteImport } from './routes/_authed/mail/$mailboxId/route'
+import { Route as AuthedMailComposeRouteImport } from './routes/_authed/mail/compose'
 import { Route as AuthedMailMailboxIdIndexRouteImport } from './routes/_authed/mail/$mailboxId/index'
 import { Route as AuthedMailMailboxIdMessageIdRouteImport } from './routes/_authed/mail/$mailboxId/$messageId'
 
-const LoginRoute = LoginRouteImport.update({
-  id: '/login',
-  path: '/login',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthedRoute = AuthedRouteImport.update({
   id: '/_authed',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthedMailRouteRoute = AuthedMailRouteRouteImport.update({
@@ -37,17 +37,17 @@ const AuthedMailRouteRoute = AuthedMailRouteRouteImport.update({
   path: '/mail',
   getParentRoute: () => AuthedRoute,
 } as any)
-const AuthedMailComposeRoute = AuthedMailComposeRouteImport.update({
-  id: '/compose',
-  path: '/compose',
-  getParentRoute: () => AuthedMailRouteRoute,
-} as any)
 const AuthedMailMailboxIdRouteRoute =
   AuthedMailMailboxIdRouteRouteImport.update({
     id: '/$mailboxId',
     path: '/$mailboxId',
     getParentRoute: () => AuthedMailRouteRoute,
   } as any)
+const AuthedMailComposeRoute = AuthedMailComposeRouteImport.update({
+  id: '/compose',
+  path: '/compose',
+  getParentRoute: () => AuthedMailRouteRoute,
+} as any)
 const AuthedMailMailboxIdIndexRoute =
   AuthedMailMailboxIdIndexRouteImport.update({
     id: '/',
@@ -127,11 +127,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authed': {
@@ -141,11 +141,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authed/mail': {
@@ -155,18 +155,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedMailRouteRouteImport
       parentRoute: typeof AuthedRoute
     }
-    '/_authed/mail/compose': {
-      id: '/_authed/mail/compose'
-      path: '/compose'
-      fullPath: '/mail/compose'
-      preLoaderRoute: typeof AuthedMailComposeRouteImport
-      parentRoute: typeof AuthedMailRouteRoute
-    }
     '/_authed/mail/$mailboxId': {
       id: '/_authed/mail/$mailboxId'
       path: '/$mailboxId'
       fullPath: '/mail/$mailboxId'
       preLoaderRoute: typeof AuthedMailMailboxIdRouteRouteImport
+      parentRoute: typeof AuthedMailRouteRoute
+    }
+    '/_authed/mail/compose': {
+      id: '/_authed/mail/compose'
+      path: '/compose'
+      fullPath: '/mail/compose'
+      preLoaderRoute: typeof AuthedMailComposeRouteImport
       parentRoute: typeof AuthedMailRouteRoute
     }
     '/_authed/mail/$mailboxId/': {
