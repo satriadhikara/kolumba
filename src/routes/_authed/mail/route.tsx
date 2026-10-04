@@ -1,5 +1,10 @@
 import { useEffect, useState } from 'react'
-import { Link, Outlet, createFileRoute, useNavigate } from '@tanstack/react-router'
+import {
+  Link,
+  Outlet,
+  createFileRoute,
+  useNavigate,
+} from '@tanstack/react-router'
 import { HugeiconsIcon } from '@hugeicons/react'
 import {
   LogoutIcon,
@@ -70,7 +75,8 @@ function MailLayout() {
     setSearchResults(null)
   }
 
-  const firstName = session.username.split('@')[0]?.split('.')[0] || session.username
+  const firstName =
+    session.username.split('@')[0]?.split('.')[0] || session.username
 
   return (
     <div className="h-screen flex flex-col">

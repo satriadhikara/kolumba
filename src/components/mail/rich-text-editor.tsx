@@ -77,10 +77,20 @@ function LinkInput({
           if (e.key === 'Escape') onCancel()
         }}
       />
-      <Button size="sm" variant="ghost" onClick={onSubmit} className="h-7 rounded-full">
+      <Button
+        size="sm"
+        variant="ghost"
+        onClick={onSubmit}
+        className="h-7 rounded-full"
+      >
         Save
       </Button>
-      <Button size="sm" variant="ghost" onClick={onCancel} className="h-7 rounded-full">
+      <Button
+        size="sm"
+        variant="ghost"
+        onClick={onCancel}
+        className="h-7 rounded-full"
+      >
         Cancel
       </Button>
     </div>
