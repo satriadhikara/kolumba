@@ -2,13 +2,15 @@
   "name": "webmail",
   "private": true,
   "type": "module",
+  "packageManager": "bun@1.3.14",
   "scripts": {
     "dev": "vite dev --port 3000",
     "build": "vite build",
     "preview": "vite preview",
     "test": "vitest run",
     "lint": "eslint",
-    "format": "prettier",
+    "typecheck": "tsc --noEmit",
+    "format": "prettier --check .",
     "check": "prettier --write . && eslint --fix"
   },
   "dependencies": {

@@ -1,0 +1,30 @@
+version: 2
+updates:
+  - package-ecosystem: bun
+    directory: /
+    schedule:
+      interval: weekly
+    # Wait before proposing a new release so compromised versions have time
+    # to be caught and yanked upstream.
+    cooldown:
+      default-days: 7
+    open-pull-requests-limit: 10
+    groups:
+      tanstack:
+        patterns: ['@tanstack/*']
+      tiptap:
+        patterns: ['@tiptap/*']
+      react:
+        patterns: ['react', 'react-dom', '@types/react', '@types/react-dom']
+      tailwind:
+        patterns: ['tailwindcss', '@tailwindcss/*']
+      dev-tooling:
+        dependency-type: development
+        update-types: [minor, patch]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7

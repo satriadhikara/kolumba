@@ -154,6 +154,12 @@ bun run test
 # Lint code
 bun run lint
 
+# Type-check
+bun run typecheck
+
+# Check formatting
+bun run format
+
 # Format and fix
 bun run check
 

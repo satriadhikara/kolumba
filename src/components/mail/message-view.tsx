@@ -333,10 +333,7 @@ export function MessageView({ email, isTrash }: MessageViewProps) {
             variant="ghost"
             size="icon"
             onClick={handleDelete}
-            className={cn(
-              'rounded-full',
-              isTrash && 'hover:text-destructive',
-            )}
+            className={cn('rounded-full', isTrash && 'hover:text-destructive')}
           >
             <HugeiconsIcon icon={Delete02Icon} className="h-4 w-4" />
           </Button>

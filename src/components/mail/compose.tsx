@@ -172,7 +172,12 @@ export function Compose({
               : 'Reply'}
         </h2>
         <div className="flex-1" />
-        <Button variant="ghost" size="icon" onClick={onClose} className="rounded-full">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={onClose}
+          className="rounded-full"
+        >
           <HugeiconsIcon icon={Cancel01Icon} className="h-5 w-5" />
         </Button>
       </div>
