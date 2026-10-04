@@ -1,4 +1,5 @@
 import { Outlet, createFileRoute } from '@tanstack/react-router'
+import type { ErrorComponentProps } from '@tanstack/react-router'
 import { getEmailsFn, getMailboxesFn } from '@/server/jmap'
 import { MessageList } from '@/components/mail/message-list'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -77,7 +78,10 @@ function MailboxPending() {
         </div>
         <div className="flex-1 overflow-y-auto p-2 space-y-1">
           {[...Array(8)].map((_, i) => (
-            <div key={i} className="flex items-start gap-3 px-3 py-3 rounded-lg">
+            <div
+              key={i}
+              className="flex items-start gap-3 px-3 py-3 rounded-lg"
+            >
               <Skeleton className="h-10 w-10 rounded-full shrink-0" />
               <div className="flex-1 min-w-0 space-y-2">
                 <Skeleton className="h-4 w-32" />
@@ -96,7 +100,7 @@ function MailboxPending() {
   )
 }
 
-function MailboxError({ error, reset }: { error: Error; reset: () => void }) {
+function MailboxError({ error, reset }: ErrorComponentProps) {
   return (
     <div className="flex flex-1 min-w-0">
       <div className="w-80 bg-muted/10 flex flex-col shrink-0 lg:w-96">

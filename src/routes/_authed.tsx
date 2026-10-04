@@ -1,4 +1,5 @@
 import { Outlet, createFileRoute } from '@tanstack/react-router'
+import type { ErrorComponentProps } from '@tanstack/react-router'
 import { requireAuthFn } from '@/server/auth'
 import { ErrorView } from '@/components/error-view'
 
@@ -15,6 +16,6 @@ function AuthedLayout() {
   return <Outlet />
 }
 
-function AuthedError({ error, reset }: { error: Error; reset: () => void }) {
+function AuthedError({ error, reset }: ErrorComponentProps) {
   return <ErrorView error={error} reset={reset} />
 }

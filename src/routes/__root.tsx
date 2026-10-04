@@ -8,6 +8,7 @@ import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
 
 import appCss from '../styles.css?url'
+import type { ErrorComponentProps } from '@tanstack/react-router'
 import { Toaster } from '@/components/ui/sonner'
 import { ErrorView } from '@/components/error-view'
 
@@ -92,7 +93,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
   )
 }
 
-function RootError({ error, reset }: { error: Error; reset: () => void }) {
+function RootError({ error, reset }: ErrorComponentProps) {
   return <ErrorView error={error} reset={reset} />
 }
 

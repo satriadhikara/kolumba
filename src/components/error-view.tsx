@@ -8,7 +8,7 @@ import {
 import { Button } from '@/components/ui/button'
 
 interface ErrorViewProps {
-  error: Error
+  error: unknown
   reset?: () => void
 }
 
@@ -39,7 +39,8 @@ export function ErrorView({ error, reset }: ErrorViewProps) {
       <h2 className="text-lg font-semibold mb-2">Something went wrong</h2>
 
       <p className="text-sm text-muted-foreground mb-6 max-w-md">
-        {error.message || 'An unexpected error occurred. Please try again.'}
+        {(error instanceof Error && error.message) ||
+          'An unexpected error occurred. Please try again.'}
       </p>
 
       <div className="flex gap-3">
