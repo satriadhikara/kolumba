@@ -14,6 +14,7 @@ import {
   SunIcon,
 } from '@hugeicons/core-free-icons'
 import { toast } from 'sonner'
+import type { ErrorComponentProps } from '@tanstack/react-router'
 import type { EmailListItem } from '@/lib/jmap/types'
 import { getMailboxesFn } from '@/server/jmap'
 import { logoutFn } from '@/server/auth'
@@ -194,13 +195,7 @@ function MailLayoutPending() {
   )
 }
 
-function MailLayoutError({
-  error,
-  reset,
-}: {
-  error: Error
-  reset: () => void
-}) {
+function MailLayoutError({ error, reset }: ErrorComponentProps) {
   return (
     <div className="h-screen flex flex-col">
       {/* Header */}

@@ -1,4 +1,5 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import type { ErrorComponentProps } from '@tanstack/react-router'
 import type { Email } from '@/lib/jmap/types'
 import { getEmailFn, getIdentitiesFn } from '@/server/jmap'
 import { Compose } from '@/components/mail/compose'
@@ -108,6 +109,6 @@ function ComposePending() {
   )
 }
 
-function ComposeError({ error, reset }: { error: Error; reset: () => void }) {
+function ComposeError({ error, reset }: ErrorComponentProps) {
   return <ErrorView error={error} reset={reset} />
 }

@@ -1,4 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
+import type { ErrorComponentProps } from '@tanstack/react-router'
 import { getEmailFn, getMailboxesFn, markAsReadFn } from '@/server/jmap'
 import { MessageView } from '@/components/mail/message-view'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -80,12 +81,6 @@ function MessageDetailPending() {
   )
 }
 
-function MessageDetailError({
-  error,
-  reset,
-}: {
-  error: Error
-  reset: () => void
-}) {
+function MessageDetailError({ error, reset }: ErrorComponentProps) {
   return <ErrorView error={error} reset={reset} />
 }
